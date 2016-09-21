@@ -1,9 +1,22 @@
-# Helpers to test Ruby gems against multiple dependency sets
+# gemika
 
-Gives you
+## Test a Ruby gem against multiple versions of everything
 
-- test matrix
-- database migration that is rewritten on every spec (optional)
+Gemika helps you test your gem against multiple versions of Ruby, dependencies and database types.
+
+- Allows to test against multiple dependency sets
+- Allows to test against multiple Ruby versions
+- Allows to test against multiple database types (currently MySQL or PostgreSQL)
+- Let developers enter their local credentials for MySQL and PostgreSQL in a `database.yml` file
+- Have a
+- default Ruby / dependency set for developers who don't care about every combination for everyday work
+- travis CI setup that tests every Ruby / dependency combinations after every push
+- A single set of Ruby / dependency set combinations for both local development and Travis CI
+- database migration that is dropped and rewritten on every test run
+- wraps examples in transaction
+
+https://docs.travis-ci.com/user/database-setup/#MySQL (root / blank)
+https://docs.travis-ci.com/user/database-setup/#PostgreSQL (postgres)
 
 
 ## Example directory structure
@@ -24,8 +37,14 @@ mygem.gemspec                               # Specification for your gem
 lib/mygem.rb                                # Library files for your gem
 spec/spec_helper.rb                         # Requires 'gemika' and all files in support folder
 spec/support/database.rb                    # Calls `Gemika.rewrite_schema! { ... }`
+spec/support/database.yml                   # Local
+spec/support/database.travis.yml            # Calls `Gemika.rewrite_schema! { ... }`
 spec/mygem/myclass_spec.rb                  # Tests for your gem
+.gitignore                                  # Should ignore spec/support/database.yml
 ```
+
+Auto-generated missing database.travis.yml from database.sample.yml and known usernames!
+
 
 ## Step-by-step integration
 
@@ -77,3 +96,11 @@ gem 'rspec', '~>3.5'
 gem 'gemika'
 gem 'mygem', :path => '..'
 ```
+
+Check in locked bundles!
+
+database.travis.yml
+
+database.sample.yml
+
+.gitignore                                  # Should ignore spec/support/database.yml
