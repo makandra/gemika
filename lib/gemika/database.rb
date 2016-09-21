@@ -4,23 +4,20 @@ module Gemika
   class Database
 
     def initialize(options = {})
-      config_folder = options.fetch(:config_folder, 'spec/support')
-      config_filename = travis? ? 'database.travis.yml' : 'database.yml'
-      config_path = File.join(config_folder, config_filename)
-      File.exists?(config_path) or raise ArgumentError, "Missing database configuration file: #{database_config_file}"
-      @config = YAML.load_file(config_path)
+      yaml_config_folder = options.fetch(:config_folder, 'spec/support')
+      yaml_config_filename = travis? ? 'database.travis.yml' : 'database.yml'
+      yaml_config_path = File.join(yaml_config_folder, yaml_config_filename)
+      if File.exists?(yaml_config_path)
+        @yaml_config = YAML.load_file(yaml_config_path)
+      else
+        warn "No database configuration in #{yaml_config_path}, using defaults: #{adapter_config.inspect}"
+        @yaml_config = {}
+      end
       @connected = false
     end
 
     def connect
       unless @connected
-        if pg?
-          adapter_config = (@config['postgresql'] || @config['postgres'] || @config['pg']).merge(adapter: 'postgresql')
-        elsif mysql2?
-          adapter_config = (@config['mysql'] || @config['mysql2']).merge(adapter: 'mysql2', encoding: 'utf8')
-        else
-          raise "Unknown database type"
-        end
         ActiveRecord::Base.establish_connection(adapter_config)
         @connected = true
       end
@@ -46,25 +43,48 @@ module Gemika
 
     private
 
+    def adapter_config
+      default_config = {}
+      default_config['database'] = guess_database_name
+      if pg?
+        default_config['adapter'] = 'postgresql'
+        default_config['username'] = 'postgres' if travis?
+        default_config['password'] = ''
+        user_config = @yaml_config['postgresql'] || @yaml_config['postgres'] || @yaml_config['pg'] || {}
+      elsif mysql2?
+        default_config['adapter'] = 'mysql2'
+        default_config['username'] = 'travis' if travis?
+        default_config['encoding'] = 'utf8'
+        user_config = (@yaml_config['mysql'] || @yaml_config['mysql2']) || {}
+      else
+        raise "Unknown database type"
+      end
+      default_config.merge(user_config)
+    end
+
+    def guess_database_name
+      project_name = File.basename(File.expand_path(__dir__))
+      "#{project_name}_test"
+    end
+
     def connection
       ActiveRecord::Base.connection
     end
 
     def pg?
-      not mysql2?
+      gem_loaded?('pg')
     end
 
     def mysql2?
-      gemfile_contents =~ /\bmysql2\b/
+      gem_loaded?('mysql2')
+    end
+
+    def gem_loaded?(name)
+      Gem.loaded_specs.has_key?(name)
     end
 
     def travis?
       !!ENV['TRAVIS']
-    end
-
-    def gemfile_contents
-      gemfile = ENV['BUNDLE_GEMFILE'] or raise "You must run this using `bundle exec`"
-      File.read(gemfile)
     end
 
   end
