@@ -11,6 +11,7 @@ module Gemika
 
     def initialize(options)
       @rows = options.fetch(:rows)
+      @rows.each { |row| validate_row(row) }
       @results = {}
       @all_passed = nil
     end
@@ -46,12 +47,20 @@ module Gemika
       rows = []
       rubies.each do |ruby|
         gemfiles.each do |gemfile|
-          entry = { 'rvm' => ruby, 'gemfile' => gemfile }
-          rows << entry unless excludes.include?(entry)
+          row = { 'rvm' => ruby, 'gemfile' => gemfile }
+          rows << row unless excludes.include?(row)
         end
       end
       rows += includes
       new(:rows => rows)
+    end
+
+    def validate_row(row)
+      gemfile = row['gemfile']
+      File.exists?(gemfile) or raise ArgumentError, "Gemfile not found: #{gemfile}"
+      contents = File.read(gemfile)
+      contents.include?('gemika') or raise ArgumentError, "Gemfile is missing gemika dependency: #{gemfile}"
+      row
     end
 
     private
