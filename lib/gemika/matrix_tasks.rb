@@ -17,9 +17,9 @@ namespace :matrix do
   end
 
   desc "Update all Ruby #{RUBY_VERSION} gemfiles"
-  task :update do
+  task :update, :gems do |t, args|
     Gemika::Matrix.from_travis_yml.each do
-      system('bundle update')
+      system("bundle update #{args[:gems]}")
     end
   end
 

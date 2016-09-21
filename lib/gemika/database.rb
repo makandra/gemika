@@ -17,7 +17,7 @@ module Gemika
         if pg?
           adapter_config = (@config['postgresql'] || @config['postgres'] || @config['pg']).merge(adapter: 'postgresql')
         elsif mysql2?
-          adapter_config = (@config['mysql2'] || @config['mysql']).merge(adapter: 'mysql2', encoding: 'utf8')
+          adapter_config = (@config['mysql'] || @config['mysql2']).merge(adapter: 'mysql2', encoding: 'utf8')
         else
           raise "Unknown database type"
         end
