@@ -63,7 +63,8 @@ module Gemika
     end
 
     def gemfile_contents
-      File.read(ENV['BUNDLE_GEMFILE'])
+      gemfile = ENV['BUNDLE_GEMFILE'] or raise "You must run this using `bundle exec`"
+      File.read(gemfile)
     end
 
   end
