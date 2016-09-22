@@ -4,7 +4,9 @@
 
 Gemika helps you test your gem against multiple versions of Ruby, gem dependencies and database types.
 
-Here's what Gemika can give your test's development setup (all steps are opt-in):
+![Matrix task output](https://raw.githubusercontent.com/makandra/gemika/master/doc/minidusen_test.png)
+
+Here's what Gemika can give your test's development setup (all features are opt-in):
 
 - Test one codebase against multiple sets of gem dependency sets (e.g. Rails 4.2, Rails 5.0).
 - Test one codebase against multiple Ruby versions (e.g. Ruby 2.1.8, Ruby 2.3.1).
