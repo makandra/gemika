@@ -232,7 +232,7 @@ matrix:
 
 ### Default Ruby and dependency set
 
-Your project will be more approachable if you're defining a default Ruby and dependency set. This way a developer can make changes and run code without knowing about the test matrix. We recommend to setup Travis CI (see below) so the entire test matrix is checked after each push, even if a developer didn't do it locally.
+Your project will be more approachable if you're defining a default Ruby and dependency set. This way a developer can make changes and run code without knowing about the test matrix. We recommend to setup Travis CI (see below) to check the entire test matrix after each push, even if a developer didn't do it locally.
 
 Create a `.ruby-version` file with the default Ruby version:
 
@@ -381,12 +381,12 @@ You should see the command output for each row in the test matrix. Gemika will a
 
 ![Matrix task output](https://raw.githubusercontent.com/makandra/gemika/master/doc/minidusen_test.png)
 
-Note that there is no task for running all gemfiles in all Ruby versions. We had something like this in earlier versions of Gemika and it wasn't as practical as we thought. You need to manually switch Ruby versions and re-run `rake matrix:install`. We recommend to setup Travis CI (see below) so the entire test matrix is checked after each push.
+Note that there is no task for running all gemfiles in all Ruby versions. We had something like this in earlier versions of Gemika and it wasn't as practical as we thought. You need to manually switch Ruby versions and re-run `rake matrix:install`. We recommend to setup Travis CI to check the entire test matrix after each push, including all Rubies.
 
 
 ## Activate Travis CI
 
-We recommend to setup Travis CI (see below) so the entire test matrix is checked after each push. Travis CI will also show the build results on Github's pull request page, helping maintainers decide whether a PR is safe to merge.
+We recommend to setup Travis CI to check the entire test matrix after each push. Travis CI will also show the build results on Github's pull request page, helping maintainers decide whether a PR is safe to merge.
 
 If you plan to use Travis CI, also add a `spec/support/database.travis.yml` with [Travis' default database credentials](https://docs.travis-ci.com/user/database-setup/):
 
