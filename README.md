@@ -168,10 +168,6 @@ gemfiles/Gemfile.4.2.mysql2
 gemfiles/Gemfile.5.0.pg
 ```
 
-#### Lock dependency graph
-
-The dependencies in your gemfiles have dependencies, which again have dependencies, etc. We need to lock down the entire dependency graph to ensure stable test runs.
-
 Create lockfiles for each bundle by running:
 
 ```shell
@@ -188,6 +184,8 @@ gemfiles/Gemfile.5.0.pg.lock
 ```
 
 Gemfiles and lockfiles should be committed to your repo.
+
+Make sure to re-run `rake matrix:install` after each change to your gemfiles, and commit the generated changes.
 
 
 ### Define combinations of gemfiles and Ruby versions
