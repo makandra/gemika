@@ -136,7 +136,11 @@ For instance, if one dependency set is Rails 3.2 with a MySQL database, we would
 gem 'rails', '~>3.2.22'
 gem 'mysql2', '= 0.3.17'
 gem 'rspec', '~> 3.4'
+
+gem 'rake'
+gem 'byebug'
 gem 'gemika'
+
 gem 'my_gem', :path => '..'
 ```
 
@@ -146,7 +150,11 @@ If a second dependency is Rails 5.0 with a PostgreSQL database, we would create 
 gem 'rails', '~>5.0.0'
 gem 'pg', '~>0.18.4'
 gem 'rspec', '~>3.5'
+
+gem 'rake'
+gem 'byebug'
 gem 'gemika'
+
 gem 'my_gem', :path => '..'
 ```
 
@@ -210,24 +218,6 @@ matrix:
       gemfile: gemfiles/Gemfile.5.0.pg
 ```
 
-If you plan to use [Travis CI](https://travis-ci.org/) (which is free and great), also add the other settings required for a Ruby project:
-
-```yaml
-language: ruby
-
-sudo: false
-
-cache: bundler
-
-notifications:
-  email:
-    - notifications@test.com
-
-script: bundle exec rspec spec
-```
-
-Adjust the `script` option if you're not using RSpec to test your code.
-
 
 ### Default Ruby and dependency set
 
@@ -282,6 +272,80 @@ cp spec/support/database.yml spec/support/database.sample.yml
 
 Remember to replace any private passwords in `database.sample.yml` with `secret` before committing.
 
+To have ActiveRecord connect to the database in `database.yml` before your tests, add a file `spec/support/database.rb` with the following content:
+
+```
+Gemika::Database.new.connect
+```
+
+Now require `spec/support/database.rb` from your `spec_helper.rb`.
+
+An optional, but useful alternative: Configure your `spec_helper.rb` to automatically `require` all files in the `spec/support` folder:
+
+```ruby
+Dir["#{File.dirname(__FILE__)}/support/*.rb"].sort.each {|f| require f}
+```
+
+Now you have a great place for code snippets that need to run before specs (factories, VCR configuration, etc.).
+
+
+
+### Test database schema
+
+If your gem is talking to the database, you probably need to create some example tables.
+
+Magika lets you define an [ActiveRecord database migration](http://api.rubyonrails.org/classes/ActiveRecord/Migration.html) for that. Before your test suite runs, Magika will drop *all* tables in your test database and recreate them using this migration.
+
+Add a file `spec/support/database.rb` with the following content:
+
+
+
+
+Transactional examples
+
+
+Migrations
+
+
+include spec/support
+
+
+
+
+
+
+
+
+
+
+
+
+
+### Try it out
+
+Check if you can install development dependencies for each entry in the test matrix:
+
+```
+bundle exec rake matrix:install
+```
+
+Check if you can run tests for each entry in the test matrix:
+
+```shell
+bundle exec rake matrix:spec
+```
+
+You should see the command output for each entry in the test matrix. Gemika will also print a summary at the end:
+
+![Matrix task output](https://raw.githubusercontent.com/makandra/gemika/master/doc/minidusen_test.png)
+
+Note that there is no task for running all gemfiles in all Ruby versions. We had something like this in earlier versions of Gemika and it wasn't as practical as we thought. You need to manually switch Ruby versions and re-run `rake matrix:install`. We recommend to setup Travis CI (see below) so the entire test matrix is checked after each push.
+
+
+## Activate Travis CI
+
+We recommend to setup Travis CI (see below) so the entire test matrix is checked after each push. Travis CI will also show the build results on Github's pull request page, helping maintainers decide whether a PR is safe to merge.
+
 If you plan to use Travis CI, also add a `spec/support/database.travis.yml` with [Travis' default database credentials](https://docs.travis-ci.com/user/database-setup/):
 
 ```yaml
@@ -296,7 +360,7 @@ postgresql:
   password:
 ```
 
-If you plan to use Travis CI, add options to `.travis.yml` to create databases before running tests:
+Add options to `.travis.yml` to create databases before running tests:
 
 ```yaml
 before_script:
@@ -304,31 +368,27 @@ before_script:
   - mysql -e 'create database IF NOT EXISTS mygem_test;'
 ```
 
+Also add the other `.travis.yml` settings required for a Ruby project:
 
+```yaml
+language: ruby
 
+sudo: false
 
-Transactional examples
+cache: bundler
 
+notifications:
+  email:
+    - notifications@test.com
 
-Migrations
+script: bundle exec rspec spec
+```
 
+Adjust the `script` option if you're not using RSpec to test your code.
 
+#### Activate Github integration
 
-
-### Try it out
-
-`rake matrix:install`
-
-`rake matrix:spec`
-
-Note that there is no task for running all gemfiles in all Ruby versions. We had something like this in earlier versions of Gemika and it wasn't as practical as we thought. You need to manually switch Ruby versions and re-run `rake matrix:install`. We recommend to setup Travis CI (see below) so the entire test matrix is checked after each push.
-
-
-## Activate Travis CI
-
-We recommend to setup Travis CI (see below) so the entire test matrix is checked after each push. Travis CI will also show the build results on Github's pull request page, helping maintainers decide whether a PR is safe to merge.
-
-To activate Travis CI:
+To activate Travis CI for your Github repo:
 
 - Log into Github
 - Open your gem's project page
@@ -340,6 +400,8 @@ To activate Travis CI:
 
 To check if the integration has worked, push a change and check if you can see your build matrix on the [Travis CI dashboard](https://travis-ci.org/).
 
+#### Build badge
+
 You might want to a build status badge to your `README.md` like this:
 
 [![Build Status](https://travis-ci.org/makandra/minidusen.svg?branch=master)](https://travis-ci.org/makandra/minidusen)
@@ -349,6 +411,8 @@ You can add such a badge using this markdown:
 ```markdown
 [![Build Status](https://travis-ci.org/my_org/my_gem.svg?branch=master)](https://travis-ci.org/my_org/my_gem)
 ```
+
+#### Protect the `master` branch
 
 If you're super paranoid you can also prevent anyone from pushing to `master` without a green Travis CI build:
 
