@@ -18,12 +18,16 @@ Here's what Gemika can give your test's development setup (all steps are opt-in)
 - Automatically drop and re-create your test database before each run of your test suite.
 - Configure RSpec to wrap each example in a transaction that is rolled back when the example ends. This way each example starts with a blank database.
 
-Gemika currently assumes you're testing with [RSpec](http://rspec.info/).
+
+## Requirements
+
+- Gemika currently assumes you're testing with [RSpec](http://rspec.info/).
+- If you use any database-related features, you need `activaterecord` as a development dependency
 
 
 ## Example directory structure
 
-Below you can see the directory of a gem with a Gemika testing setup. The next section describes how to get there:
+Below you can see the directory of a gem with a completed Gemika testing setup. The next section describes how to get there:
 
 ```shell
 Rakefile                                    # requires 'gemika/matrix_tasks'
@@ -165,7 +169,11 @@ gemfiles/Gemfile.4.2.mysql2
 gemfiles/Gemfile.5.0.pg
 ```
 
-Now create lockfiles for each bundle by running:
+#### Lock dependency graph
+
+The dependencies in your gemfiles have dependencies, which again have dependencies, etc. We need to lock down the entire dependency graph to ensure stable test runs.
+
+Create lockfiles for each bundle by running:
 
 ```shell
 rake matrix:install
@@ -206,6 +214,9 @@ gemfile:
 ```
 
 Don't mind the `rvm` key if you're using a different version manager locally (like rbenv). Things will still work.
+
+
+#### Excluding incompatible matrix rows
 
 There might be incompatible combinations of gemfiles and Rubies, e.g. Rails 5.0 does not work with Ruby 2.1 or lower. In this case, add an `matrix`/`exclude` key to your `.travis.yml`:
 
@@ -275,12 +286,18 @@ Remember to replace any private passwords in `database.sample.yml` with `secret`
 To have ActiveRecord connect to the database in `database.yml` before your tests, add a file `spec/support/database.rb` with the following content:
 
 ```
-Gemika::Database.new.connect
+database = Gemika::Database.new
+database.connect
 ```
 
-Now require `spec/support/database.rb` from your `spec_helper.rb`.
+Now require Gemika and this support file from your `spec_helper.rb`.
 
-An optional, but useful alternative: Configure your `spec_helper.rb` to automatically `require` all files in the `spec/support` folder:
+```
+require 'gemika'
+require 'spec/support/database'
+```
+
+Protip: Instead of requiring support files indidually, configure your `spec_helper.rb` to automatically `require` all files in the `spec/support` folder:
 
 ```ruby
 Dir["#{File.dirname(__FILE__)}/support/*.rb"].sort.each {|f| require f}
@@ -289,53 +306,78 @@ Dir["#{File.dirname(__FILE__)}/support/*.rb"].sort.each {|f| require f}
 Now you have a great place for code snippets that need to run before specs (factories, VCR configuration, etc.).
 
 
-
-### Test database schema
+#### Test database schema
 
 If your gem is talking to the database, you probably need to create some example tables.
 
 Magika lets you define an [ActiveRecord database migration](http://api.rubyonrails.org/classes/ActiveRecord/Migration.html) for that. Before your test suite runs, Magika will drop *all* tables in your test database and recreate them using this migration.
 
-Add a file `spec/support/database.rb` with the following content:
+Add your migration to your `spec/support/database.rb` (created and required above):
 
+```ruby
 
+database = Gemika::Database.new
+database.connect
+database.rewrite_schema! do
 
+  create_table :users do |t|
+    t.string :name
+    t.string :email
+    t.string :city
+  end
 
-Transactional examples
+  create_table :recipes do |t|
+    t.string :name
+    t.integer :category_id
+  end
 
+  create_table :recipe_ingredients do |t|
+    t.string :name
+    t.integer :recipe_id
+  end
 
-Migrations
+  create_table :recipe_categories do |t|
+    t.string :name
+  end
 
+end
+```
 
-include spec/support
+#### Wrap examples in transactions
 
+A very useful Rails default is to wrap every test in a transaction that is rolled back when the example ends. This way each example starts with a blank database.
 
+To get the same behavior in your gem tests, append the following to your `spec_helper.rb`:
 
+```
+Gemika::RSpec.configure_transactional_examples
+```
 
+Note that you also need `require 'gemika'` in your `spec_helper.rb`.
 
+Now every RSpec example is wrapped in a transaction. To disable this behavior for an individual example, use the `transaction: false` option:
 
-
-
-
-
-
-
+```
+it 'should work', transaction: false do
+  # code that doesn't work within a transaction, e.g. threads
+end
+```
 
 ### Try it out
 
-Check if you can install development dependencies for each entry in the test matrix:
+Check if you can install development dependencies for each row in the test matrix:
 
 ```
 bundle exec rake matrix:install
 ```
 
-Check if you can run tests for each entry in the test matrix:
+Check if you can run tests for each row in the test matrix:
 
 ```shell
 bundle exec rake matrix:spec
 ```
 
-You should see the command output for each entry in the test matrix. Gemika will also print a summary at the end:
+You should see the command output for each row in the test matrix. Gemika will also print a summary at the end:
 
 ![Matrix task output](https://raw.githubusercontent.com/makandra/gemika/master/doc/minidusen_test.png)
 
