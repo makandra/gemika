@@ -244,6 +244,8 @@ ln -s gemfiles/Gemfile.4.2.mysql2 Gemfile
 ln -s gemfiles/Gemfile.4.2.mysql2.lock Gemfile.lock
 ```
 
+Note that since you now have a Gemfile in your project root, you will need to call `bundle exec rake` instead of `rake` from this point on.
+
 Commit both `.ruby-version` and symlinks to your repo.
 
 We recommend to setup Travis CI (see below) to check the entire test matrix after each push, even if a developer only tested with the defaults.
