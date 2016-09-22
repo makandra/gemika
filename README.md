@@ -68,7 +68,7 @@ Gemika expects a standard gem directory that looks roughly like this:
 
 ```
 my_gem.gemspec                              # Specification for your gem
-Rakefile                                    # Should require 'gemika/tasks'
+Rakefile                                    # Rake tasks for your gem
 lib/my_gem.rb                               # Library files for your gem
 ```
 
