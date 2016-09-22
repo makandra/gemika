@@ -18,8 +18,7 @@ Here's what Gemika can give your test's development setup (all steps are opt-in)
 - Automatically drop and re-create your test database before each run of your test suite.
 - Configure RSpec to wrap each example in a transaction that is rolled back when the example ends. This way each example starts with a blank database.
 
-https://docs.travis-ci.com/user/database-setup/#MySQL (root / blank)
-https://docs.travis-ci.com/user/database-setup/#PostgreSQL (postgres)
+Gemika currently assumes you're testing with [RSpec](http://rspec.info/).
 
 
 ## Example directory structure
@@ -39,20 +38,41 @@ Gemfile.lock -> gemfiles/Gemfile.set2.lock  # Symlink to default Gemfile.lock fo
 .gitignore                                  # Should ignore spec/support/database.yml
 .ruby-version                               # Default Ruby version for development
 .travis.yml                                 # Configures all tested Ruby / gemfile combinations, for both local development and Travis CI
-mygem.gemspec                               # Specification for your gem
+my_gem.gemspec                              # Specification for your gem
 Rakefile                                    # Should require 'gemika/tasks'
-lib/mygem.rb                                # Library files for your gem
+README.md                                   # README for your gem
+lib/my_gem.rb                               # Library files for your gem
+lib/my_gem/my_class.rb                      # Class delivered by your gem
+lib/my_gem/version.rb                       # Version definition for your gem
 spec/spec_helper.rb                         # Requires 'gemika' and all files in support folder
 spec/support/database.rb                    # Calls `Gemika.rewrite_schema! { ... }`
 spec/support/database.yml                   # Local
 spec/support/database.travis.yml            # Calls `Gemika.rewrite_schema! { ... }`
-spec/mygem/myclass_spec.rb                  # Tests for your gem
+spec/my_gem/my_class_spec.rb                # Tests for your gem
 ```
-
-Auto-generated missing database.travis.yml from database.sample.yml and known usernames!
 
 
 ## Step-by-step integration
+
+
+### Have a standard gem setup
+
+Gemika expects a standard gem directory that looks roughly like this:
+
+```
+my_gem.gemspec                              # Specification for your gem
+Rakefile                                    # Should require 'gemika/tasks'
+lib/my_gem.rb                               # Library files for your gem
+```
+
+If you don't have a directory yet, you can [ask Bundler to create it for you](http://bundler.io/rubygems.html):
+
+```
+bundle gem my_gem
+```
+
+This will create a new directory named `my_gem` with your new gem skeleton.
+
 
 ### Install Gemika
 
@@ -62,6 +82,8 @@ Switch to your favorite Ruby version and install the Gemika gem:
 gem install gemika
 ```
 
+Future contributors to your gem can install Gemika using the Gemfiles we will create below.
+
 
 ### Rake tasks
 
@@ -69,13 +91,13 @@ Add this to your `Rakefile` to gain tasks `matrix:install`, `matrix:spec`, `matr
 
 ```ruby
 begin
-  require 'gemika/matrix_tasks'
+  require 'gemika/tasks'
 rescue LoadError
   puts 'Run `gem install gemika` for additional tasks'
 end
 ```
 
-
+Check that the tasks appear with `rake -T`:
 
 ```shell
 rake matrix:install       # Install all Ruby 2.2.4 gemfiles
@@ -89,17 +111,21 @@ We also recommend to make `matrix:spec` the default task in your `Rakefile`:
 task :default => 'matrix:spec'
 ```
 
-Create directory for all your dependency sets:
+### Define multiple dependency sets
+
+We are now creating one `Gemfile` for each set of gems and database type you'd like to test again.
+
+First, create a directory for the gemfiles:
 
 ```shell
 mkdir gemfiles
 ```
 
-For each dependency set, create a `Gemfile` in the gemfiles directory that contains:
+For each dependency set, create a `Gemfile` in the `gemfiles` directory that contains:
 
-1. The dependencies for that set
-2. The development dependencies for that set (e.g. `rspec`) in a version compatible with 1.
-3. The `gemica` gem
+1. The runtime dependencies you'd like to test against (e.g. Rails 5)
+2. The development dependencies for that set (e.g. `rspec`) in a version that is compatible with these runtime gependencies.
+3. The `gemika` gem
 4. Your own gem from path `..`
  
 For instance, if one dependency set is Rails 3.2 with a MySQL database, we would create `gemfile/Gemfile.4.2.mysql2` with these contents:
@@ -109,7 +135,7 @@ gem 'activerecord', '~>3.2.22'
 gem 'mysql2', '= 0.3.17'
 gem 'rspec', '~> 3.4'
 gem 'gemika'
-gem 'mygem', :path => '..'
+gem 'my_gem', :path => '..'
 ```
 
 If a second dependency is Rails 5.0 with a PostgreSQL database, we would create `gemfile/Gemfile.5.0.pg` with these contents:
@@ -119,13 +145,158 @@ gem 'activerecord', '~>5.0.0'
 gem 'pg', '~>0.18.4'
 gem 'rspec', '~>3.5'
 gem 'gemika'
-gem 'mygem', :path => '..'
+gem 'my_gem', :path => '..'
 ```
 
-Check in locked bundles!
+In this example, your `gemfiles` directory should now look like this:
 
-database.travis.yml
+```
+gemfiles/Gemfile.4.2.mysql2
+gemfiles/Gemfile.5.0.pg
+```
 
-database.sample.yml
+Now create lockfiles for each bundle by running:
 
-.gitignore                                  # Should ignore spec/support/database.yml
+```shell
+rake matrix:install
+```
+
+In this example, your `gemfiles` directory should now look like this:
+
+```
+gemfiles/Gemfile.4.2.mysql2
+gemfiles/Gemfile.4.2.mysql2.lock
+gemfiles/Gemfile.5.0.pg
+gemfiles/Gemfile.5.0.pg.lock
+```
+
+Gemfiles and lockfiles should be committed to your repo.
+
+
+### Define combinations of gemfiles and Ruby versions
+
+We will now define a test matrix that contains all permutations of gemfiles and Ruby version.
+
+We store the matrix in a `.travis.yml` file, **even if the project is not using Travis CI**. This allows us to configure the matrix once and us it for both local developent and Travis CI builds.
+
+Create a `.travis.yml` that lists all gemfiles and Ruby versions you'd like to test against:
+
+```yaml
+rvm:
+  - 2.1.8
+  - 2.2.4
+  - 2.3.1
+
+gemfile:
+  - gemfiles/Gemfile.3.2.mysql2
+  - gemfiles/Gemfile.4.2.mysql2
+  - gemfiles/Gemfile.4.2.pg
+  - gemfiles/Gemfile.5.0.mysql2
+  - gemfiles/Gemfile.5.0.pg
+```
+
+There might be incompatible combinations of gemfiles and Rubies, e.g. Rails 5.0 does not work with Ruby 2.1 or lower. In this case, add an `matrix`/`exclude` key to your `.travis.yml`:
+
+```yaml
+matrix:
+  exclude:
+    - rvm: 2.1.8
+      gemfile: gemfiles/Gemfile.5.0.mysql2
+    - rvm: 2.1.8
+      gemfile: gemfiles/Gemfile.5.0.pg
+```
+
+If you plan to use Travis CI (which is free and great), also add the other settings required for a Ruby project:
+
+```yaml
+language: ruby
+
+sudo: false
+
+cache: bundler
+
+notifications:
+  email:
+    - notifications@test.com
+
+script: bundle exec rspec spec
+```
+
+Adjust the `script` option if you're not using RSpec to test your code.
+
+
+### Test databases
+
+Create a local test database `my_gem_test` in either MySQL, PostgreSQL or both (depending on what you support). If you want to test against multiple database types, you should have created one gemfile for each type above.
+
+Now create a file `spec/support/database.yml` that contains your local database credentials:
+
+```yaml
+mysql:
+  database: my_gem_test
+  host: localhost
+  username: root
+  password: secret
+
+postgresql:
+  database: minidusen_test
+  user:
+  password:
+```
+
+We don't want to commit our local credentials, so add a line to your `.gitignore`:
+
+```
+spec/support/database.yml
+```
+
+What we *will* commit is a `database.sample.yml` as a template for future contributors:
+
+```
+cp spec/support/database.yml spec/support/database.sample.yml
+```
+
+Remember to replace any private passwords in `database.sample.yml` with `secret` before committing.
+
+If you plan to use Travis CI, also add a `spec/support/database.travis.yml` with [Travis' default database credentials](https://docs.travis-ci.com/user/database-setup/):
+
+```yaml
+mysql:
+  database: my_gem_test
+  username: travis
+  password:
+
+postgresql:
+  database: my_gem_test
+  user: postgres
+  password:
+```
+
+If you plan to use Travis CI, add options to `.travis.yml` to create databases before running tests:
+
+```yaml
+before_script:
+  - psql -c 'create database mygem_test;' -U postgres
+  - mysql -e 'create database IF NOT EXISTS mygem_test;'
+```
+
+
+Activate Travis CI
+
+
+
+
+Add to README:
+
+
+```markdown
+- Create a local test database `my_gem_test` in both MySQL and PostgreSQL
+- Copy `spec/support/database.sample.yml` to `spec/support/database.yml` and enter your local credentials for the test databases
+- Install development dependencies using `bundle install`
+- Run tests using `bundle exec rspec`
+
+To test the gem against multiple dependency sets:
+
+- Install development dependencies using `bundle matrix:install`
+- Run tests using `bundle matrix:spec`
+```
