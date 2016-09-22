@@ -229,7 +229,7 @@ matrix:
 
 ### Default Ruby and dependency set
 
-Your project will be more approachable if you're defining a default Ruby and dependency set. This way a developer can make changes and run code without knowing about the test matrix. We recommend to setup Travis CI (see below) to check the entire test matrix after each push, even if a developer didn't do it locally.
+Your project will be more approachable if you're defining a default Ruby and dependency set. This way a developer can make changes and run code without knowing about the test matrix.
 
 Create a `.ruby-version` file with the default Ruby version:
 
@@ -245,6 +245,8 @@ ln -s gemfiles/Gemfile.4.2.mysql2.lock Gemfile.lock
 ```
 
 Commit both `.ruby-version` and symlinks to your repo.
+
+We recommend to setup Travis CI (see below) to check the entire test matrix after each push, even if a developer only tested with the defaults.
 
 
 ### Test databases
