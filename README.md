@@ -210,7 +210,7 @@ matrix:
       gemfile: gemfiles/Gemfile.5.0.pg
 ```
 
-If you plan to use Travis CI (which is free and great), also add the other settings required for a Ruby project:
+If you plan to use [Travis CI](https://travis-ci.org/) (which is free and great), also add the other settings required for a Ruby project:
 
 ```yaml
 language: ruby
@@ -231,7 +231,7 @@ Adjust the `script` option if you're not using RSpec to test your code.
 
 ### Default Ruby and dependency set
 
-Your project will be more approachable if you're defining a default Ruby and dependency set. This way a developer can make changes and run code without knowing about the test matrix. We recommend to setup Travis CI (see below) so the entire test matrix is checked after a push, even if a developer didn't do it locally.
+Your project will be more approachable if you're defining a default Ruby and dependency set. This way a developer can make changes and run code without knowing about the test matrix. We recommend to setup Travis CI (see below) so the entire test matrix is checked after each push, even if a developer didn't do it locally.
 
 Create a `.ruby-version` file with the default Ruby version:
 
@@ -305,6 +305,8 @@ before_script:
 ```
 
 
+
+
 Transactional examples
 
 
@@ -319,24 +321,52 @@ Migrations
 
 `rake matrix:spec`
 
-Note that there is no task for running all gemfiles in all Ruby versions. We had something like this in earlier versions of Gemika and it wasn't as practical as we thought. You need to manually switch Ruby versions and re-run `rake matrix:install`. We recommend to setup Travis CI (see below) so the entire test matrix is checked after a push.
+Note that there is no task for running all gemfiles in all Ruby versions. We had something like this in earlier versions of Gemika and it wasn't as practical as we thought. You need to manually switch Ruby versions and re-run `rake matrix:install`. We recommend to setup Travis CI (see below) so the entire test matrix is checked after each push.
 
 
 ## Activate Travis CI
 
-Integrations
+We recommend to setup Travis CI (see below) so the entire test matrix is checked after each push. Travis CI will also show the build results on Github's pull request page, helping maintainers decide whether a PR is safe to merge.
 
+To activate Travis CI:
 
-Super paranoid: protected branch.
+- Log into Github
+- Open your gem's project page
+- Open *Settings*
+- Navigate to *Integrations & services*
+- Open the *Add service* dropdown
+- Select *Travis CI*
+- Authenticate via OAuth
 
+To check if the integration has worked, push a change and check if you can see your build matrix on the [Travis CI dashboard](https://travis-ci.org/).
 
+You might want to a build status badge to your `README.md` like this:
+
+[![Build Status](https://travis-ci.org/makandra/minidusen.svg?branch=master)](https://travis-ci.org/makandra/minidusen)
+
+You can add such a badge using this markdown:
+
+```markdown
+[![Build Status](https://travis-ci.org/my_org/my_gem.svg?branch=master)](https://travis-ci.org/my_org/my_gem)
+```
+
+If you're super paranoid you can also prevent anyone from pushing to `master` without a green Travis CI build:
+
+- Open your Github project settings
+- Navigate to *Branches*
+- Below *Protected branches*, open the *Choose a branch...* dropdown
+- Select `master`
+- Check *Protect this branch*
+- Check *Require status checks to pass before merging*
+- Check the status check `continuous-integration/travis-ci`
+- Press *Save changes*
 
 
 ## Add development instructions to your README
 
-Your `README` should contain instructions how to run tests before making a PR. You might also want to educate future contributors about the existence of your test matrix, and how to use it.
+Your README should contain instructions how to run tests before making a PR. You might also want to educate future contributors about the existence of your test matrix, and how to use it.
 
-We recommend to add a section like the following:
+We recommend to add a section like the following to your `README.md`:
 
 ```markdown
 ## Development
