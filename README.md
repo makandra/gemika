@@ -46,13 +46,14 @@ Gemfile.lock -> gemfiles/Gemfile.set2.lock  # Symlink to default Gemfile.lock fo
 my_gem.gemspec                              # Specification for your gem
 Rakefile                                    # Should require 'gemika/tasks'
 README.md                                   # README for your gem
-lib/my_gem.rb                               # Library files for your gem
+lib/my_gem.rb                               # Main file to require for your gem
 lib/my_gem/my_class.rb                      # Class delivered by your gem
 lib/my_gem/version.rb                       # Version definition for your gem
 spec/spec_helper.rb                         # Requires 'gemika' and all files in support folder
-spec/support/database.rb                    # Calls `Gemika.rewrite_schema! { ... }`
-spec/support/database.yml                   # Local
-spec/support/database.travis.yml            # Calls `Gemika.rewrite_schema! { ... }`
+spec/support/database.rb                    # Database schema for test database
+spec/support/database.yml                   # Database credentials for local development (not checked in)
+spec/support/database.sample.yml            # Sample database credentials for new developers
+spec/support/database.travis.yml            # Database credentials for Travis CI
 spec/my_gem/my_class_spec.rb                # Tests for your gem
 ```
 
@@ -69,7 +70,7 @@ Gemika expects a standard gem directory that looks roughly like this:
 ```shell
 my_gem.gemspec  # Specification for your gem
 Rakefile        # Rake tasks for your gem
-lib/my_gem.rb   # Library files for your gem
+lib/my_gem.rb   # Main file to require for your gem
 ```
 
 If you don't have a directory yet, you can [ask Bundler to create it for you](http://bundler.io/rubygems.html):
