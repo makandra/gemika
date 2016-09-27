@@ -1,0 +1,10 @@
+mysql:
+  database: gemika_test
+  host: localhost
+  username: root
+  password: junior
+
+postgresql:
+  database: gemika_test
+  user:
+  password:

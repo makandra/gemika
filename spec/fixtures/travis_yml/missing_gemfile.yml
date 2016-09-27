@@ -1,0 +1,5 @@
+rvm:
+  - 2.1.8
+
+gemfile:
+  - gemfiles/nonexisting_gemfile

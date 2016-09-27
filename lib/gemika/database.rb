@@ -3,6 +3,9 @@ require 'yaml'
 module Gemika
   class Database
 
+    class Error < StandardError; end
+    class UnknownAdapter < Error; end
+
     def initialize(options = {})
       yaml_config_folder = options.fetch(:config_folder, 'spec/support')
       yaml_config_filename = travis? ? 'database.travis.yml' : 'database.yml'
@@ -57,7 +60,7 @@ module Gemika
         default_config['encoding'] = 'utf8'
         user_config = (@yaml_config['mysql'] || @yaml_config['mysql2']) || {}
       else
-        raise "Unknown database type"
+        raise UnknownAdapater, "Unknown database type. Either 'pg' or 'mysql2' gem should be in your current bundle."
       end
       default_config.merge(user_config)
     end

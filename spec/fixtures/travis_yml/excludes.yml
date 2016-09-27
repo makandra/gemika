@@ -1,0 +1,12 @@
+rvm:
+  - 2.1.8
+  - 2.3.1
+
+gemfile:
+  - gemfiles/Gemfile1
+  - gemfiles/Gemfile2
+
+matrix:
+  exclude:
+    - rvm: 2.1.8
+      gemfile: gemfiles/Gemfile1
