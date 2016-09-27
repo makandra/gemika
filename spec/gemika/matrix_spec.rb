@@ -1,3 +1,5 @@
+require 'spec_helper' # can't move this to .rspec in RSpec 1
+
 describe Gemika::Matrix do
 
   before :each do
@@ -15,10 +17,10 @@ describe Gemika::Matrix do
       current_ruby = '2.1.8'
       row1 = Gemika::Matrix::Row.new(:ruby => current_ruby, :gemfile => 'gemfiles/Gemfile1')
       row2 = Gemika::Matrix::Row.new(:ruby => current_ruby, :gemfile => 'gemfiles/Gemfile2')
-      matrix = Gemika::Matrix.new(:rows =>[row1, row2], :validate => false, :current_ruby => current_ruby, silent: true)
+      matrix = Gemika::Matrix.new(:rows =>[row1, row2], :validate => false, :current_ruby => current_ruby, :silent => true)
       spy = double('block')
-      spy.should receive(:observe_gemfile).with('gemfiles/Gemfile1')
-      spy.should receive(:observe_gemfile).with('gemfiles/Gemfile2')
+      spy.should_receive(:observe_gemfile).with('gemfiles/Gemfile1')
+      spy.should_receive(:observe_gemfile).with('gemfiles/Gemfile2')
       matrix.each do
         spy.observe_gemfile(ENV['BUNDLE_GEMFILE'])
         true
@@ -30,10 +32,10 @@ describe Gemika::Matrix do
       other_ruby = '2.3.1'
       row1 = Gemika::Matrix::Row.new(:ruby => current_ruby, :gemfile => 'gemfiles/Gemfile1')
       row2 = Gemika::Matrix::Row.new(:ruby => other_ruby, :gemfile => 'gemfiles/Gemfile2')
-      matrix = Gemika::Matrix.new(:rows =>[row1, row2], :validate => false, :current_ruby => current_ruby, silent: true)
+      matrix = Gemika::Matrix.new(:rows =>[row1, row2], :validate => false, :current_ruby => current_ruby, :silent => true)
       spy = double('block')
-      spy.should receive(:observe_gemfile).with('gemfiles/Gemfile1')
-      spy.should_not receive(:observe_gemfile).with('gemfiles/Gemfile2')
+      spy.should_receive(:observe_gemfile).with('gemfiles/Gemfile1')
+      spy.should_not_receive(:observe_gemfile).with('gemfiles/Gemfile2')
       matrix.each do
         spy.observe_gemfile(ENV['BUNDLE_GEMFILE'])
         true
@@ -42,10 +44,10 @@ describe Gemika::Matrix do
 
     it "resets ENV['BUNDLE GEMFILE'] to its initial value afterwards" do
       original_env = ENV['BUNDLE_GEMFILE']
-      expect(original_env).to be_present
+      original_env.should be_present
       current_ruby = '2.1.8'
       row = Gemika::Matrix::Row.new(:ruby => current_ruby, :gemfile => 'gemfiles/Gemfile1')
-      matrix = Gemika::Matrix.new(:rows =>[row], :validate => false, :current_ruby => current_ruby, silent: true)
+      matrix = Gemika::Matrix.new(:rows =>[row], :validate => false, :current_ruby => current_ruby, :silent => true)
       matrix.each { true }
       ENV['BUNDLE_GEMFILE'].should == original_env
     end
@@ -57,7 +59,7 @@ describe Gemika::Matrix do
       require 'stringio'
       actual_output = ''
       io = StringIO.new(actual_output)
-      matrix = Gemika::Matrix.new(:rows =>[row1, row2, row3], :validate => false, :current_ruby => '2.1.8', io: io, color: false)
+      matrix = Gemika::Matrix.new(:rows =>[row1, row2, row3], :validate => false, :current_ruby => '2.1.8', :io => io, :color => false)
       commands = [
         lambda { io.puts 'Successful output'; true },
         lambda { io.puts 'Failed output'; false },
@@ -87,7 +89,7 @@ EOF
     it 'should raise an error if a row failed (returns false)' do
       current_ruby = '2.1.8'
       row = Gemika::Matrix::Row.new(:ruby => current_ruby, :gemfile => 'gemfiles/Gemfile')
-      matrix = Gemika::Matrix.new(:rows =>[row], :validate => false, :current_ruby => current_ruby, silent: true)
+      matrix = Gemika::Matrix.new(:rows =>[row], :validate => false, :current_ruby => current_ruby, :silent => true)
       expect { matrix.each { false } }.to raise_error(Gemika::Matrix::Failed, /Some gemfiles failed/i)
     end
 
@@ -95,7 +97,7 @@ EOF
       current_ruby = '2.1.8'
       other_ruby = '2.3.1'
       row = Gemika::Matrix::Row.new(:ruby => other_ruby, :gemfile => 'gemfiles/Gemfile')
-      matrix = Gemika::Matrix.new(:rows =>[row], :validate => false, :current_ruby => current_ruby, silent: true)
+      matrix = Gemika::Matrix.new(:rows =>[row], :validate => false, :current_ruby => current_ruby, :silent => true)
       expect { matrix.each { false } }.to raise_error(Gemika::Matrix::Incompatible, /No gemfiles were compatible/i)
     end
 
@@ -105,7 +107,7 @@ EOF
 
     it 'builds a matrix by combining Ruby versions and gemfiles from a Travis CI configuration file' do
       path = 'spec/fixtures/travis_yml/two_by_two.yml'
-      matrix = Gemika::Matrix.from_travis_yml(:path => path, validate: false)
+      matrix = Gemika::Matrix.from_travis_yml(:path => path, :validate => false)
       matrix.rows.size.should == 4
       matrix.rows[0].ruby.should == '2.1.8'
       matrix.rows[0].gemfile.should == 'gemfiles/Gemfile1'
@@ -119,7 +121,7 @@ EOF
 
     it 'allows to exclude rows from the matrix' do
       path = 'spec/fixtures/travis_yml/excludes.yml'
-      matrix = Gemika::Matrix.from_travis_yml(:path => path, validate: false)
+      matrix = Gemika::Matrix.from_travis_yml(:path => path, :validate => false)
       matrix.rows.size.should == 3
       matrix.rows[0].ruby.should == '2.1.8'
       matrix.rows[0].gemfile.should == 'gemfiles/Gemfile2'

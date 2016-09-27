@@ -6,7 +6,7 @@ Gemika helps you test your gem against multiple versions of Ruby, gem dependenci
 
 ![Matrix task output](https://raw.githubusercontent.com/makandra/gemika/master/doc/minidusen_test.png)
 
-### Features
+## Features
 
 Here's what Gemika can give your test's development setup (all features are opt-in):
 
@@ -23,10 +23,19 @@ Here's what Gemika can give your test's development setup (all features are opt-
 - Configure RSpec to wrap each example in a transaction that is rolled back when the example ends. This way each example starts with a blank database.
 
 
-### Requirements
+## Compatibility
 
-- Gemika currently assumes you're testing with [RSpec](http://rspec.info/).
-- If you use any database-related features, you need `activaterecord` as a development dependency
+Gemika currently supports the following dependency versions:
+
+- Ruby: 1.8.7, 2.1, 2.2, 2.3
+- RSpec: Versions 1, 3
+- ActiveRecord: Versions 2.3, 3.2, 4.2, 5.0
+- Databases: PostgreSQL (with `pg` gem), MySQL or MariaDB (with `mysql2` gem)
+
+Gemika also makes some assumption about your Gem:
+
+- You're testing with [RSpec](http://rspec.info/).
+- If you use any database-related features, you need `activerecord` as a development dependency
 
 
 ## Example directory structure

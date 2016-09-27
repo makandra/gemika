@@ -1,4 +1,5 @@
 require 'yaml'
+require 'gemika/env'
 
 module Gemika
   class Matrix
@@ -30,7 +31,7 @@ module Gemika
         end
 
         def convert_row(travis_row)
-          Row.new(ruby: travis_row['rvm'], gemfile: travis_row['gemfile'])
+          Row.new(:ruby => travis_row['rvm'], :gemfile => travis_row['gemfile'])
         end
 
       end
@@ -70,7 +71,7 @@ module Gemika
       @color = options.fetch(:color, true)
       validate = options.fetch(:validate, true)
       @rows.each(&:validate!) if validate
-      @results = {}
+      @results = Env.new_ordered_hash
       @compatible_count = 0
       @all_passed = nil
       @current_ruby = options.fetch(:current_ruby, RUBY_VERSION)
@@ -83,7 +84,7 @@ module Gemika
         if row.compatible_with_ruby?(current_ruby)
           @compatible_count += 1
           print_title gemfile
-          gemfile_passed = call_block_with_gemfile(block, gemfile)
+          gemfile_passed = Env.with_gemfile(gemfile, row, &block)
           @all_passed &= gemfile_passed
           if gemfile_passed
             @results[row] = tint('Success', COLOR_SUCCESS)
@@ -110,14 +111,6 @@ module Gemika
       unless @silent
         @io.puts(*args)
       end
-    end
-
-    def call_block_with_gemfile(block, gemfile)
-      original_gemfile = ENV['BUNDLE_GEMFILE']
-      ENV['BUNDLE_GEMFILE'] = gemfile
-      block.call
-    ensure
-      ENV['BUNDLE_GEMFILE'] = original_gemfile
     end
 
     def tint(message, color)
