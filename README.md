@@ -6,6 +6,8 @@ Gemika helps you test your gem against multiple versions of Ruby, gem dependenci
 
 ![Matrix task output](https://raw.githubusercontent.com/makandra/gemika/master/doc/minidusen_test.png)
 
+### Features
+
 Here's what Gemika can give your test's development setup (all features are opt-in):
 
 - Test one codebase against multiple sets of gem dependency sets (e.g. Rails 4.2, Rails 5.0).
@@ -21,7 +23,7 @@ Here's what Gemika can give your test's development setup (all features are opt-
 - Configure RSpec to wrap each example in a transaction that is rolled back when the example ends. This way each example starts with a blank database.
 
 
-## Requirements
+### Requirements
 
 - Gemika currently assumes you're testing with [RSpec](http://rspec.info/).
 - If you use any database-related features, you need `activaterecord` as a development dependency
