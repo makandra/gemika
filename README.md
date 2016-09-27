@@ -438,6 +438,12 @@ notifications:
   email:
     - notifications@test.com
 
+install:
+  # Old Travis CI bundler explodes when lockfile version doesn't match recently bumped version
+  - gem install bundler --version='=1.12.5'
+  # This is the default Travis CI install step
+  - bundle install --jobs=3 --retry=3 --deployment --path=${BUNDLE_PATH:-vendor/bundle}
+
 script: bundle exec rspec spec
 ```
 
