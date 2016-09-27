@@ -18,7 +18,7 @@ before_script:
   - psql -c 'create database gemika_test;' -U postgres
   - mysql -e 'create database IF NOT EXISTS gemika_test;'
 
-script: bundle exec rspec spec
+script: bundle exec rake gemika:spec
 
 sudo: false
 

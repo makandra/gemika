@@ -74,14 +74,10 @@ module Gemika
 
     def gem?(name, requirement_string = nil)
       gem = Gem.loaded_specs[name]
-      #puts Gem.loaded_specs.keys
-      #puts "Gem for #{name}: #{gem.inspect} / #{Gem.loaded_specs.has_key?(name)}"
       if gem
         if requirement_string
           requirement = Gem::Requirement.new(requirement_string)
           version = gem.version
-          #puts "requirement: #{requirement.inspect}"
-          #puts "version: #{version.inspect}"
           gem_requirement_satisfied_by_version?(requirement, version)
         else
           true
