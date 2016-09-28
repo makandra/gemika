@@ -1,52 +1,95 @@
+require 'gemika/errors'
+require 'gemika/env'
+
 module Gemika
-  class RSpec
-    class << self
+  module RSpec
 
-      def configure_transactional_examples
-        if Env.rspec_1?
+    ##
+    # Runs the RSpec binary.
+    #
+    def run_specs(options = nil)
+      options ||= {}
+      files = options.fetch(:files, 'spec')
+      rspec_options = options.fetch(:options, '--color')
+      # We need to override the gemfile explicitely, since we have a default Gemfile in the project root
+      gemfile = options.fetch(:gemfile, Gemika::Env.gemfile)
+      fatal = options.fetch(:fatal, true)
+      runner = binary(:gemfile => gemfile)
+      command = "bundle exec #{runner} #{rspec_options} #{files}"
+      result = shell_out(command)
+      if result
+        true
+      elsif fatal
+        raise RSpecFailed, "RSpec failed: #{command}"
+      else
+        false
+      end
+    end
 
-          Spec::Runner.configure do |config|
+    ##
+    # Returns the binary name for the current RSpec version.
+    #
+    def binary(options = {})
+      if Env.gem?('rspec', '< 2', options)
+        'spec'
+      else
+        'rspec'
+      end
+    end
 
-            config.before :each do
-              # from ActiveRecord::Fixtures#setup_fixtures
-              connection = ActiveRecord::Base.connection
-              connection.increment_open_transactions
-              connection.transaction_joinable = false
-              connection.begin_db_transaction
-            end
+    ##
+    # Configures RSpec.
+    #
+    # Works with both RSpec 1 and RSpec 2.
+    #
+    def configure(&block)
+      configurator.configure(&block)
+    end
 
-            config.after :each do
-              # from ActiveRecord::Fixtures#teardown_fixtures
-              connection = ActiveRecord::Base.connection
-              if connection.open_transactions != 0
-                connection.rollback_db_transaction
-                connection.decrement_open_transactions
-              end
-            end
-
-          end
-
-        else
-
-          ::RSpec.configure do |config|
-            config.around do |example|
-              if example.metadata.fetch(:transaction, example.metadata.fetch(:rollback, true))
-                ActiveRecord::Base.transaction do
-                  begin
-                    example.run
-                  ensure
-                    raise ActiveRecord::Rollback
-                  end
-                end
-              else
-                example.run
-              end
-            end
-          end
-
+    ##
+    # Configures RSpec to clean out the database before each example.
+    #
+    # Requires the `database_cleaner` gem to be added to your development dependencies.
+    #
+    def configure_clean_database_before_example
+      require 'database_cleaner' # optional dependency
+      configure do |config|
+        config.before(:each) do
+          # Truncation works across most database adapters; I had issues with :deletion and pg
+          DatabaseCleaner.clean_with(:truncation)
         end
       end
-
     end
+
+    ##
+    # Configures RSpec so it allows the `should` syntax that works across all RSpec versions.
+    #
+    def configure_should_syntax
+      if Env.gem?('rspec', '>= 2.11')
+        configure do |config|
+          config.expect_with(:rspec) { |c| c.syntax = [:should, :expect] }
+          config.mock_with(:rspec) { |c| c.syntax = [:should, :expect] }
+        end
+      else
+        # We have an old RSpec that only understands should syntax
+      end
+    end
+
+    private
+
+    def shell_out(command)
+      system(command)
+    end
+
+    def configurator
+      if Env.gem?('rspec', '<2')
+        Spec::Runner
+      else
+        ::RSpec
+      end
+    end
+
+    extend self
+
   end
 end

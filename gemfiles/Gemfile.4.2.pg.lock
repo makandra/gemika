@@ -1,7 +1,7 @@
 PATH
   remote: ..
   specs:
-    gemika (0.1.4)
+    gemika (0.2.0)
 
 GEM
   remote: https://rubygems.org/
@@ -21,6 +21,7 @@ GEM
       tzinfo (~> 1.1)
     arel (6.0.3)
     builder (3.2.2)
+    database_cleaner (1.5.3)
     diff-lcs (1.2.5)
     i18n (0.7.0)
     json (1.8.3)
@@ -49,6 +50,7 @@ PLATFORMS
 
 DEPENDENCIES
   activerecord (~> 4.2.1)
+  database_cleaner
   gemika!
   pg
   rake

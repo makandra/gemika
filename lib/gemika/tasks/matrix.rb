@@ -1,46 +1,40 @@
+require 'gemika/env'
 require 'gemika/matrix'
+require 'gemika/rspec'
 
-module Gemika
-  module Tasks
-    RSPEC_ARGS = '--color spec'
-  end
-end
-
+##
+# Rake tasks to run commands for each compatible row in the test matrix.
+#
 namespace :matrix do
 
   desc "Run specs for all Ruby #{RUBY_VERSION} gemfiles"
-  task :spec do
+  task :spec, :files do |t, options|
     Gemika::Matrix.from_travis_yml.each do |row|
-      rspec_binary = Gemika::Env.rspec_binary_for_gemfile(row.gemfile)
-      args = Gemika::Tasks::RSPEC_ARGS
-      system("bundle exec #{rspec_binary} #{args}")
+      options = options.to_hash.merge(:gemfile => row.gemfile, :fatal => false)
+      Gemika::RSpec.run_specs(options)
     end
   end
 
   desc "Install all Ruby #{RUBY_VERSION} gemfiles"
   task :install do
     Gemika::Matrix.from_travis_yml.each do |row|
+      puts "Calling `bundle install` with #{ENV['BUNDLE_GEMFILE']}"
       system('bundle install')
     end
   end
 
-  desc "Update all Ruby #{RUBY_VERSION} gemfiles"
-  task :update, :gems do |t, args|
+  desc "List dependencies for all Ruby #{RUBY_VERSION} gemfiles"
+  task :list do
     Gemika::Matrix.from_travis_yml.each do |row|
-      system("bundle update #{args[:gems]}")
+      system('bundle list')
     end
   end
 
-end
-
-namespace :gemika do
-
-  # Private task to pick the correct RSpec binary
-  # (spec in RSpec 1, rspec in RSpec 2+)
-  task :spec do
-    rspec_binary = Gemika::Env.rspec_binary
-    args = Gemika::Tasks::RSPEC_ARGS
-    system("bundle exec #{rspec_binary} #{args}")
+  desc "Update all Ruby #{RUBY_VERSION} gemfiles"
+  task :update, :gems do |t, options|
+    Gemika::Matrix.from_travis_yml.each do |row|
+      system("bundle update #{options[:gems]}")
+    end
   end
 
 end

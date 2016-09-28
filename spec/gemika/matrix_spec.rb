@@ -65,7 +65,7 @@ describe Gemika::Matrix do
         lambda { io.puts 'Failed output'; false },
         lambda { io.puts 'Skipped output'; false  }
       ]
-      expect { matrix.each { commands.shift.call } }.to raise_error(Gemika::Matrix::Failed)
+      expect { matrix.each { commands.shift.call } }.to raise_error(Gemika::MatrixFailed)
       expected_output = <<EOF
 gemfiles/GemfileAlpha
 
@@ -90,7 +90,7 @@ EOF
       current_ruby = '2.1.8'
       row = Gemika::Matrix::Row.new(:ruby => current_ruby, :gemfile => 'gemfiles/Gemfile')
       matrix = Gemika::Matrix.new(:rows =>[row], :validate => false, :current_ruby => current_ruby, :silent => true)
-      expect { matrix.each { false } }.to raise_error(Gemika::Matrix::Failed, /Some gemfiles failed/i)
+      expect { matrix.each { false } }.to raise_error(Gemika::MatrixFailed, /Some gemfiles failed/i)
     end
 
     it 'should raise an error if no row if compatible with the current Ruby' do
@@ -98,7 +98,7 @@ EOF
       other_ruby = '2.3.1'
       row = Gemika::Matrix::Row.new(:ruby => other_ruby, :gemfile => 'gemfiles/Gemfile')
       matrix = Gemika::Matrix.new(:rows =>[row], :validate => false, :current_ruby => current_ruby, :silent => true)
-      expect { matrix.each { false } }.to raise_error(Gemika::Matrix::Incompatible, /No gemfiles were compatible/i)
+      expect { matrix.each { false } }.to raise_error(Gemika::UnsupportedRuby, /No gemfiles were compatible/i)
     end
 
   end
@@ -133,12 +133,12 @@ EOF
 
     it 'raises an error if a Gemfile does not exist' do
       path = 'spec/fixtures/travis_yml/missing_gemfile.yml'
-      expect { Gemika::Matrix.from_travis_yml(:path => path) }.to raise_error(Gemika::Matrix::Invalid, /gemfile not found/i)
+      expect { Gemika::Matrix.from_travis_yml(:path => path) }.to raise_error(Gemika::MissingGemfile, /gemfile not found/i)
     end
 
     it 'raises an error if a Gemfile does not depend on "gemika"' do
       path = 'spec/fixtures/travis_yml/gemfile_without_gemika.yml'
-      expect { Gemika::Matrix.from_travis_yml(:path => path) }.to raise_error(Gemika::Matrix::Invalid, /missing gemika dependency/i)
+      expect { Gemika::Matrix.from_travis_yml(:path => path) }.to raise_error(Gemika::UnusableGemfile, /missing gemika dependency/i)
     end
 
   end

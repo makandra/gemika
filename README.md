@@ -10,17 +10,17 @@ Gemika helps you test your gem against multiple versions of Ruby, gem dependenci
 
 Here's what Gemika can give your test's development setup (all features are opt-in):
 
-- Test one codebase against multiple sets of gem dependency sets (e.g. Rails 4.2, Rails 5.0).
-- Test one codebase against multiple Ruby versions (e.g. Ruby 2.1.8, Ruby 2.3.1).
+- Test one codebase against multiple sets of runtime gem dependency sets (e.g. Rails 2.3, Rails 5.0).
+- Test one codebase against multiple Ruby versions (e.g. Ruby 1.8.7, Ruby 2.3.10).
 - Test one codebase against multiple database types (currently MySQL or PostgreSQL).
-- Compute a matrix of all possible dependency permutations (Ruby, gem set, database type). Manually exclude incompatible dependency permutations (e.g. Rails 5.0 does not work with Ruby 2.1).
+- Compute a matrix of all possible dependency permutations (Ruby, runtime gems, database type). Manually exclude incompatible dependency permutations (e.g. Rails 5.0 does not work with Ruby 2.1).
 - Let developers enter their local credentials for MySQL and PostgreSQL in a `database.yml` file.
 - Define default Ruby version, gem dependencies and database for developers who don't care about every possible permutation for everyday work.
 - Help configure a [Travis CI](https://travis-ci.org/) build that tests every dependency permutation after each `git push`.
 - Share your Ruby / gem dependeny / database permutation between local development and Travis CI.
 - Define an [ActiveRecord database migration](http://api.rubyonrails.org/classes/ActiveRecord/Migration.html) that sets up your test database.
 - Automatically drop and re-create your test database before each run of your test suite.
-- Configure RSpec to wrap each example in a transaction that is rolled back when the example ends. This way each example starts with a blank database.
+- Work around breaking changes in RSpec, Ruby and other gems
 
 
 ## Compatibility
@@ -28,7 +28,7 @@ Here's what Gemika can give your test's development setup (all features are opt-
 Gemika currently supports the following dependency versions:
 
 - Ruby: 1.8.7, 2.1, 2.2, 2.3
-- RSpec: Versions 1, 3
+- RSpec: Versions 1, 2, 3
 - ActiveRecord: Versions 2.3, 3.2, 4.2, 5.0
 - Databases: PostgreSQL (with `pg` gem), MySQL or MariaDB (with `mysql2` gem)
 
@@ -119,9 +119,11 @@ end
 Check that the tasks appear with `rake -T`:
 
 ```shell
-rake matrix:install       # Install all Ruby 2.2.4 gemfiles
-rake matrix:spec          # Run specs for all Ruby 2.2.4 gemfiles
-rake matrix:update[gems]  # Update all Ruby 2.2.4 gemfiles
+rake current_rspec[files]  # Run specs with the current RSpec version
+rake matrix:install        # Install all Ruby 1.8.7 gemfiles
+rake matrix:list           # List dependencies for all Ruby 1.8.7 gemfiles
+rake matrix:spec[files]    # Run specs for all Ruby 1.8.7 gemfiles
+rake matrix:update[gems]   # Update all Ruby 1.8.7 gemfiles
 ```
 
 We also recommend to make `matrix:spec` the default task in your `Rakefile`:
@@ -150,28 +152,34 @@ For each dependency set, create a `Gemfile` in the `gemfiles` directory that con
 For instance, if one dependency set is Rails 3.2 with a MySQL database, we would create `gemfiles/Gemfile.4.2.mysql2` with these contents:
 
 ```ruby
+# Runtime dependencies
 gem 'rails', '~>3.2.22'
 gem 'mysql2', '= 0.3.17'
 gem 'rspec', '~> 3.4'
 
+# Development dependencies
 gem 'rake'
 gem 'byebug'
 gem 'gemika'
 
+# Gem under test
 gem 'my_gem', :path => '..'
 ```
 
 If a second dependency is Rails 5.0 with a PostgreSQL database, we would create `gemfiles/Gemfile.5.0.pg` with these contents:
 
 ```ruby
+# Runtime dependencies
 gem 'rails', '~>5.0.0'
 gem 'pg', '~>0.18.4'
 gem 'rspec', '~>3.5'
 
+# Development dependencies
 gem 'rake'
 gem 'byebug'
 gem 'gemika'
 
+# Gem under test
 gem 'my_gem', :path => '..'
 ```
 
@@ -234,14 +242,14 @@ There might be incompatible combinations of gemfiles and Rubies, e.g. Rails 5.0 
 ```yaml
 matrix:
   exclude:
-    - rvm: 2.1.8
-      gemfile: gemfiles/Gemfile.5.0.mysql2
-    - rvm: 2.1.8
-      gemfile: gemfiles/Gemfile.5.0.pg
+    - gemfile: gemfiles/Gemfile.5.0.mysql2
+      rvm: 2.1.8
+    - gemfile: gemfiles/Gemfile.5.0.pg
+      rvm: 2.1.8
 ```
 
 
-### Default Ruby and dependency set
+### Default Ruby and default gemfile
 
 Your project will be more approachable if you're defining a default Ruby and dependency set. This way a developer can make changes and run code without knowing about the test matrix.
 
@@ -257,8 +265,6 @@ Choose a default dependency set and symlink both gemfile and lockfile to your pr
 ln -s gemfiles/Gemfile.4.2.mysql2 Gemfile
 ln -s gemfiles/Gemfile.4.2.mysql2.lock Gemfile.lock
 ```
-
-Note that since you now have a Gemfile in your project root, you will need to call `bundle exec rake` instead of `rake` from this point on.
 
 Commit both `.ruby-version` and symlinks to your repo.
 
@@ -325,7 +331,7 @@ Now you have a great place for code snippets that need to run before specs (fact
 
 If your gem is talking to the database, you probably need to create some example tables.
 
-Magika lets you define an [ActiveRecord database migration](http://api.rubyonrails.org/classes/ActiveRecord/Migration.html) for that. Before your test suite runs, Magika will drop *all* tables in your test database and recreate them using this migration.
+Gemika lets you define an [ActiveRecord database migration](http://api.rubyonrails.org/classes/ActiveRecord/Migration.html) for that. Before your test suite runs, Gemika will drop *all* tables in your test database and recreate them using this migration.
 
 Add your migration to your `spec/support/database.rb` (created and required above):
 
@@ -358,31 +364,30 @@ database.rewrite_schema! do
 end
 ```
 
-#### Wrap examples in transactions
+#### Clean database before each test
 
 A very useful Rails default is to wrap every test in a transaction that is rolled back when the example ends. This way each example starts with a blank database.
 
-To get the same behavior in your gem tests, append the following to your `spec_helper.rb`:
+To get the same behavior in your gem tests, add `database_cleaner` as a development dependency to all your gemfiles:
 
+```ruby
+gem 'database_cleaner'
 ```
-Gemika::RSpec.configure_transactional_examples
+
+If you don't want to configure `database_cleaner` manually, you can ask Gemika to clean the database before each example:
+
+```ruby
+Gemika::RSpec.configure_clean_database_before_example
 ```
 
 Note that you also need `require 'gemika'` in your `spec_helper.rb`.
 
-Now every RSpec example is wrapped in a transaction. To disable this behavior for an individual example, use the `transaction: false` option:
-
-```
-it 'should work', transaction: false do
-  # code that doesn't work within a transaction, e.g. threads
-end
-```
 
 ### Try it out
 
 Check if you can install development dependencies for each row in the test matrix:
 
-```
+```shell
 bundle exec rake matrix:install
 ```
 
@@ -392,11 +397,38 @@ Check if you can run tests for each row in the test matrix:
 bundle exec rake matrix:spec
 ```
 
+To only run some examples, put the list of files in square brackets (it's a Rake thing):
+
+```shell
+bundle exec rake matrix:spec[spec/foo_spec.rb:1005]
+```
+
 You should see the command output for each row in the test matrix. Gemika will also print a summary at the end:
 
 ![Matrix task output](https://raw.githubusercontent.com/makandra/gemika/master/doc/minidusen_test.png)
 
-Note that there is no task for running all gemfiles in all Ruby versions. We had something like this in earlier versions of Gemika and it wasn't as practical as we thought. You need to manually switch Ruby versions and re-run `rake matrix:install`. We recommend to setup Travis CI to check the entire test matrix after each push, including all Rubies.
+If you now discover compatibility issue with your library, see below how Gemika can help you [bridge incompatibilities between dependency sets](#bridging-incompatibilities-between-dependency-sets).
+
+
+### Running specs in multiple Ruby versions
+
+Note that there is no task for automatically running all gemfiles in all Ruby versions. We had something like this in earlier versions of Gemika and it wasn't as practical as we thought.
+
+Instead you need to manually switch Ruby versions and re-run:
+
+```shell
+rake matrix:install
+rake matrix:spec
+```
+
+Note that if your current Ruby version is *very* far away from your [default Ruby](#default-ruby-and-default-gemfile) in `.ruby-version`, you might need to run `rake` with a gemfile that has compatible dependencies:
+
+```shell
+BUNDLE_GEMFILE=gemfiles/Gemfile.2.3 bundle exec rake matrix:install
+BUNDLE_GEMFILE=gemfiles/Gemfile.2.3 bundle exec rake matrix:spec
+```
+
+We recommend to setup Travis CI to check the entire test matrix after each push, including all Rubies. This way developers can stay on the [default Ruby and gemfile](#default-ruby-and-default-gemfile) most of the time while Travis CI checks make sure that nothing broken gets merged.
 
 
 ## Activate Travis CI
@@ -444,10 +476,11 @@ install:
   # This is the default Travis CI install step
   - bundle install --jobs=3 --retry=3 --deployment --path=${BUNDLE_PATH:-vendor/bundle}
 
-script: bundle exec rspec spec
+script: bundle exec rake current_rspec
 ```
 
 Adjust the `script` option if you're not using RSpec to test your code.
+
 
 #### Activate Github integration
 
@@ -467,7 +500,7 @@ To check if the integration has worked, push a change and check if you can see y
 
 You might want to a build status badge to your `README.md` like this:
 
-[![Build Status](https://travis-ci.org/makandra/minidusen.svg?branch=master)](https://travis-ci.org/makandra/minidusen)
+[![Build Status](https://travis-ci.org/makandra/gemika.svg?branch=master)](https://travis-ci.org/makandra/gemika)
 
 You can add such a badge using this markdown:
 
@@ -491,9 +524,7 @@ If you're super paranoid you can also prevent anyone from pushing to `master` wi
 
 ## Add development instructions to your README
 
-Your README should contain instructions how to run tests before making a PR. You might also want to educate future contributors about the existence of your test matrix, and how to use it.
-
-We recommend to add a section like the following to your `README.md`:
+Your README should contain instructions how to run tests before making a PR. We recommend to add a section like the one below to your `README.md`:
 
 ```markdown
 ## Development
@@ -514,11 +545,80 @@ We recommend to test large changes against multiple versions of Ruby and multipl
 Note that we have configured Travis CI to automatically run tests in all supported Ruby versions and dependency sets after each push. We will only merge pull requests after a green Travis build.
 ```
 
+Adjust the first part to match what you chose as your [default Ruby and default gemfile](#default-ruby-and-dependency-set).
+
+
+Bridging incompatibilities between dependency sets
+---------------------------------------------------
+
+Gemika can help you bridge incompatibilities or breaking changes between Ruby versions, gem versions, or RSpec.
+
+
+### Version switches
+
+Check if a gem was activated by the current gemfile:
+
+```ruby
+Gemika::Env.gem?('activesupport')
+```
+
+Check if a gem was activated and satisfies a version requirement:
+
+```ruby
+Gemika::Env.gem?('activesupport', '>= 5')
+Gemika::Env.gem?('activesupport', '~> 5.0.0')
+Gemika::Env.gem?('activesupport', '< 5')
+```
+
+Check if the current Ruby version satisfies a version requirement:
+
+```ruby
+Gemika::Env.ruby?('>= 2')
+Gemika::Env.ruby?('< 2')
+Gemika::Env.ruby?('~> 2.1.0')
+```
+
+Check if the process is running as a Travis CI build:
+
+```ruby
+Gemika::Env.travis?
+```
+
+### RSpec 1 vs. RSpec 2+
+
+If you're testing gems against Rails 2.3 or Ruby 1.8.7 you might need to test with RSpec 1. There are a lot of differences between RSpec 1 and later versions, which Gemika helps to pave over.
+
+Configuring RSpec requires you to work on a different module in RSpec 1 (`Spec::Runner`) and RSpec 2 (just `RSpec`). The following works for all RSpec versions:
+
+```ruby
+Gemika::RSpec.configure do |config|
+
+  config.before(:each) do
+    # runs before each example
+  end
+
+end
+```
+
+When your tests need to run with RSpec 1, you need to use the old `should` syntax, which works across all RSpec versions.
+
+To enable this `should` syntax for later RSpecs:
+
+```ruby
+Gemika::RSpec.configure_should_syntax
+```
+
+RSpec 1 has a binary `spec`, while later RSpecs use `rspec`. To call the correct binary for the current gemfile:
+
+```shell
+rake current_rspec
+```
+
 
 Development
 -----------
 
-Here are some hints when you try to make changes to Gemika:
+Here are some hints when you try to make changes to Gemika itself:
 
 There are tests in `spec`. We only accept PRs with tests. To run tests:
 

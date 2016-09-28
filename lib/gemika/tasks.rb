@@ -1,2 +1,2 @@
 require 'gemika/tasks/matrix'
-require 'gemika/tasks/database'
+require 'gemika/tasks/rspec'

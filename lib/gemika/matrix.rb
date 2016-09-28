@@ -1,14 +1,15 @@
 require 'yaml'
+require 'gemika/errors'
 require 'gemika/env'
 
 module Gemika
   class Matrix
 
-    class Error < StandardError; end
-    class Invalid < Error; end
-    class Failed < Error; end
-    class Incompatible < Error; end
-
+    ##
+    # Load `.travis.yml` files.
+    #
+    # @!visibility private
+    #
     class TravisConfig
       class << self
 
@@ -37,6 +38,9 @@ module Gemika
       end
     end
 
+    ##
+    # A row in the test matrix
+    #
     class Row
 
       def initialize(attrs)
@@ -44,16 +48,32 @@ module Gemika
         @gemfile = attrs.fetch(:gemfile)
       end
 
-      attr_reader :ruby, :gemfile
+      ##
+      # The Ruby version for the row.
+      #
+      attr_reader :ruby
 
-      def compatible_with_ruby?(current_ruby)
+      ##
+      # The path to the gemfile for the row.
+      #
+      attr_reader :gemfile
+
+      ##
+      # Returns whether this row can be run with the given Ruby version.
+      #
+      def compatible_with_ruby?(current_ruby = Env.ruby)
         ruby == current_ruby
       end
 
+      ##
+      # Raises an error if this row is invalid.
+      #
+      # @!visibility private
+      #
       def validate!
-        File.exists?(gemfile) or raise Invalid, "Gemfile not found: #{gemfile}"
+        File.exists?(gemfile) or raise MissingGemfile, "Gemfile not found: #{gemfile}"
         contents = File.read(gemfile)
-        contents.include?('gemika') or raise Invalid, "Gemfile is missing gemika dependency: #{gemfile}"
+        contents.include?('gemika') or raise UnusableGemfile, "Gemfile is missing gemika dependency: #{gemfile}"
       end
 
     end
@@ -77,6 +97,13 @@ module Gemika
       @current_ruby = options.fetch(:current_ruby, RUBY_VERSION)
     end
 
+    ##
+    # Runs the given `block` for each matrix row that is compatible with the current Ruby.
+    #
+    # The row's gemfile will be set as an environment variable, so Bundler will use that gemfile if you shell out in `block`.
+    #
+    # At the end it will print a summary of which rows have passed, failed or were skipped (due to incompatible Ruby version).
+    #
     def each(&block)
       @all_passed = true
       rows.each do |row|
@@ -98,6 +125,12 @@ module Gemika
       print_summary
     end
 
+    ##
+    # Builds a {Matrix} from the given `.travis.yml` file.
+    #
+    # @param [Hash] options
+    # @option options [String] Path to the `.travis.yml` file.
+    #
     def self.from_travis_yml(options = {})
       rows = TravisConfig.load_rows(options)
       new(options.merge(:rows => rows))
@@ -143,7 +176,7 @@ module Gemika
         message = "No gemfiles were compatible with Ruby #{RUBY_VERSION}"
         puts tint(message, COLOR_FAILURE)
         puts
-        raise Incompatible, message
+        raise UnsupportedRuby, message
       elsif @all_passed
         puts tint("All gemfiles succeeded for Ruby #{RUBY_VERSION}", COLOR_SUCCESS)
         puts
@@ -151,7 +184,7 @@ module Gemika
         message = 'Some gemfiles failed'
         puts tint(message, COLOR_FAILURE)
         puts
-        raise Failed, message
+        raise MatrixFailed, message
       end
     end
 

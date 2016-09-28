@@ -14,6 +14,29 @@ gemfile:
   - gemfiles/Gemfile.5.0.mysql2
   - gemfiles/Gemfile.5.0.pg
 
+matrix:
+  exclude:
+    - gemfile: gemfiles/Gemfile.2.3.mysql2
+      rvm: 2.1.8
+    - gemfile: gemfiles/Gemfile.2.3.mysql2
+      rvm: 2.2.4
+    - gemfile: gemfiles/Gemfile.2.3.mysql2
+      rvm: 2.3.1
+    - gemfile: gemfiles/Gemfile.3.2.mysql2
+      rvm: 2.3.1
+    - gemfile: gemfiles/Gemfile.4.2.mysql2
+      rvm: 1.8.7
+    - gemfile: gemfiles/Gemfile.4.2.pg
+      rvm: 1.8.7
+    - gemfile: gemfiles/Gemfile.5.0.mysql2
+      rvm: 1.8.7
+    - gemfile: gemfiles/Gemfile.5.0.pg
+      rvm: 1.8.7
+    - gemfile: gemfiles/Gemfile.5.0.mysql2
+      rvm: 2.1.8
+    - gemfile: gemfiles/Gemfile.5.0.pg
+      rvm: 2.1.8
+
 install:
   # Old Travis CI bundler explodes when lockfile version doesn't match recently bumped version
   - gem install bundler --version='=1.12.5'
@@ -24,7 +47,7 @@ before_script:
   - psql -c 'create database gemika_test;' -U postgres
   - mysql -e 'create database IF NOT EXISTS gemika_test;'
 
-script: bundle exec rake gemika:spec
+script: bundle exec rake current_rspec
 
 sudo: false
 
@@ -33,24 +56,3 @@ cache: bundler
 notifications:
   email:
     - fail@makandra.de
-
-matrix:
-  exclude:
-    - rvm: 1.8.7
-      gemfile: gemfiles/Gemfile.4.2.mysql2
-    - rvm: 1.8.7
-      gemfile: gemfiles/Gemfile.4.2.pg
-    - rvm: 1.8.7
-      gemfile: gemfiles/Gemfile.5.0.mysql2
-    - rvm: 1.8.7
-      gemfile: gemfiles/Gemfile.5.0.pg
-    - rvm: 2.1.8
-      gemfile: gemfiles/Gemfile.2.3.mysql2
-    - rvm: 2.1.8
-      gemfile: gemfiles/Gemfile.5.0.mysql2
-    - rvm: 2.1.8
-      gemfile: gemfiles/Gemfile.5.0.pg
-    - rvm: 2.2.4
-      gemfile: gemfiles/Gemfile.2.3.mysql2
-    - rvm: 2.3.1
-      gemfile: gemfiles/Gemfile.2.3.mysql2

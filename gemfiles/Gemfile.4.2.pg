@@ -1,9 +1,18 @@
 source 'https://rubygems.org'
 
+# Ruby
+ruby '>= 1.9.3'
+
+# Runtime dependencies
 gem 'activerecord', '~>4.2.1'
 gem 'rspec', '~>3.4'
 gem 'pg'
 
+# Development dependencies
 gem 'rake'
+gem 'database_cleaner'
 
+# Gem under test
 gem 'gemika', :path => '..'
+
+ruby '>= 1.9.3'

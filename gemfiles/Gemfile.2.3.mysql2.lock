@@ -1,7 +1,7 @@
 PATH
   remote: ..
   specs:
-    gemika (0.1.4)
+    gemika (0.2.0)
 
 GEM
   remote: https://rubygems.org/
@@ -9,6 +9,7 @@ GEM
     activerecord (2.3.18)
       activesupport (= 2.3.18)
     activesupport (2.3.18)
+    database_cleaner (1.0.1)
     i18n (0.6.11)
     mysql2 (0.2.20)
     rake (10.0.4)
@@ -19,6 +20,7 @@ PLATFORMS
 
 DEPENDENCIES
   activerecord (= 2.3.18)
+  database_cleaner
   gemika!
   i18n (= 0.6.11)
   mysql2 (= 0.2.20)
