@@ -15,7 +15,8 @@ module Gemika
       gemfile = options.fetch(:gemfile, Gemika::Env.gemfile)
       fatal = options.fetch(:fatal, true)
       runner = binary(:gemfile => gemfile)
-      command = "bundle exec #{runner} #{rspec_options} #{files}"
+      bundle_exec = options.fetch(:bundle_exec) ? 'bundle exec' : nil
+      command = [bundle_exec, runner, rspec_options, files].compact.join(' ')
       result = shell_out(command)
       if result
         true

@@ -1,7 +1,6 @@
 PATH
   remote: ..
   specs:
-    gemika (0.2.0)
 
 GEM
   remote: https://rubygems.org/
@@ -55,6 +54,9 @@ DEPENDENCIES
   mysql2 (~> 0.3.17)
   rake
   rspec (~> 3.4)
+
+RUBY VERSION
+   ruby 2.2.4p230
 
 BUNDLED WITH
    1.12.5

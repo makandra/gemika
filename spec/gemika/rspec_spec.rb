@@ -23,20 +23,29 @@ describe Gemika::RSpec do
   describe '.run_specs' do
 
     it 'shells out to the binary' do
-      expected_command = %{bundle exec #{subject.binary} --color spec}
+      expected_command = %{#{subject.binary} --color spec}
       subject.should_receive(:shell_out).with(expected_command).and_return(true)
-      subject.run_specs
+      subject.run_specs(:bundle_exec => false)
     end
 
     it 'allows to pass a :files option' do
-      expected_command = %{bundle exec #{subject.binary} --color spec/foo_spec.rb:23}
+      expected_command = %{#{subject.binary} --color spec/foo_spec.rb:23}
       subject.should_receive(:shell_out).with(expected_command).and_return(true)
-      subject.run_specs(:files => 'spec/foo_spec.rb:23')
+      subject.run_specs(
+        :bundle_exec => false,
+        :files => 'spec/foo_spec.rb:23'
+      )
+    end
+
+    it 'calls the binary with `bundle exec` if :bundle_exec option is true' do
+      expected_command = %{bundle exec #{subject.binary} --color spec}
+      subject.should_receive(:shell_out).with(expected_command).and_return(true)
+      subject.run_specs(:bundle_exec => true)
     end
 
     it 'raises an error if the call returns a non-zero error code' do
       subject.should_receive(:shell_out).with(anything).and_return(false)
-      expect { subject.run_specs }.to raise_error(Gemika::RSpecFailed)
+      expect { subject.run_specs(:bundle_exec => false) }.to raise_error(Gemika::RSpecFailed)
     end
 
   end
