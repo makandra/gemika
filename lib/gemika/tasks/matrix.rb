@@ -22,7 +22,6 @@ namespace :matrix do
   desc "Install all Ruby #{RUBY_VERSION} gemfiles"
   task :install do
     Gemika::Matrix.from_travis_yml.each do |row|
-      puts "Calling `bundle install` with #{ENV['BUNDLE_GEMFILE']}"
       system('bundle install')
     end
   end
