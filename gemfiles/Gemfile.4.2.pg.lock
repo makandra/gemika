@@ -1,7 +1,7 @@
 PATH
   remote: ..
   specs:
-    gemika (0.2.0)
+    gemika (0.3.0)
 
 GEM
   remote: https://rubygems.org/
@@ -55,6 +55,9 @@ DEPENDENCIES
   pg
   rake
   rspec (~> 3.4)
+
+RUBY VERSION
+   ruby 2.3.1p112
 
 BUNDLED WITH
    1.12.5
