@@ -158,9 +158,9 @@ source 'https://rubygems.org'
 # Runtime dependencies
 gem 'rails', '~>3.2.22'
 gem 'mysql2', '= 0.3.17'
-gem 'rspec', '~> 3.4'
 
 # Development dependencies
+gem 'rspec', '~> 3.4'
 gem 'rake'
 gem 'byebug'
 gem 'gemika'
@@ -177,9 +177,9 @@ source 'https://rubygems.org'
 # Runtime dependencies
 gem 'rails', '~>5.0.0'
 gem 'pg', '~>0.18.4'
-gem 'rspec', '~>3.5'
 
 # Development dependencies
+gem 'rspec', '~>3.5'
 gem 'rake'
 gem 'byebug'
 gem 'gemika'
