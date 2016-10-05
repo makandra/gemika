@@ -153,6 +153,8 @@ For each dependency set, create a `Gemfile` in the `gemfiles` directory that con
 For instance, if one dependency set is Rails 3.2 with a MySQL database, we would create `gemfiles/Gemfile.4.2.mysql2` with these contents:
 
 ```ruby
+source 'https://rubygems.org'
+
 # Runtime dependencies
 gem 'rails', '~>3.2.22'
 gem 'mysql2', '= 0.3.17'
@@ -170,6 +172,8 @@ gem 'my_gem', :path => '..'
 If a second dependency is Rails 5.0 with a PostgreSQL database, we would create `gemfiles/Gemfile.5.0.pg` with these contents:
 
 ```ruby
+source 'https://rubygems.org'
+
 # Runtime dependencies
 gem 'rails', '~>5.0.0'
 gem 'pg', '~>0.18.4'
