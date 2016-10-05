@@ -79,9 +79,10 @@ For a live example of this setup, check the [makandra/minidusen](https://github.
 Gemika expects a standard gem directory that looks roughly like this:
 
 ```shell
-my_gem.gemspec  # Specification for your gem
-Rakefile        # Rake tasks for your gem
-lib/my_gem.rb   # Main file to require for your gem
+my_gem.gemspec      # Specification for your gem
+Rakefile            # Rake tasks for your gem
+lib/my_gem.rb       # Main file to require for your gem
+spec/my_gem_spec.rb # Tests for your gem
 ```
 
 If you don't have a directory yet, you can [ask Bundler to create it for you](http://bundler.io/rubygems.html):
