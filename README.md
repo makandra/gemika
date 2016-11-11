@@ -195,25 +195,6 @@ gemfiles/Gemfile.4.2.mysql2
 gemfiles/Gemfile.5.0.pg
 ```
 
-Create lockfiles for each bundle by running:
-
-```shell
-rake matrix:install
-```
-
-In this example, your `gemfiles` directory should now contain a lockfile for each gemfile:
-
-```
-gemfiles/Gemfile.4.2.mysql2
-gemfiles/Gemfile.4.2.mysql2.lock
-gemfiles/Gemfile.5.0.pg
-gemfiles/Gemfile.5.0.pg.lock
-```
-
-Gemfiles and lockfiles should be committed to your repo.
-
-Make sure to re-run `rake matrix:install` after each change to your gemfiles, and commit the generated changes.
-
 
 ### Define combinations of gemfiles and Ruby versions
 
@@ -252,6 +233,27 @@ matrix:
     - gemfile: gemfiles/Gemfile.5.0.pg
       rvm: 2.1.8
 ```
+
+### Generate lockfiles
+
+Generate lockfiles for each bundle by running:
+
+```shell
+rake matrix:install
+```
+
+In this example, your `gemfiles` directory should now contain a lockfile for each gemfile:
+
+```
+gemfiles/Gemfile.4.2.mysql2
+gemfiles/Gemfile.4.2.mysql2.lock
+gemfiles/Gemfile.5.0.pg
+gemfiles/Gemfile.5.0.pg.lock
+```
+
+Gemfiles and lockfiles should be committed to your repo.
+
+Make sure to re-run `rake matrix:install` after each change to your gemfiles, and commit the generated changes.
 
 
 ### Default Ruby and default gemfile
