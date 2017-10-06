@@ -480,9 +480,7 @@ notifications:
 install:
   # Replace default Travis CI bundler script with a version that doesn't
   # explode when lockfile doesn't match recently bumped version
-  - gem uninstall bundler -x -I
-  - gem install bundler --version='=1.12.5'
-  - bundle install --jobs=3 --retry=3 --path=${BUNDLE_PATH:-vendor/bundle}
+  - bundle install --no-deployment --jobs=3 --retry=3 --path=${BUNDLE_PATH:-vendor/bundle}
 
 script: bundle exec rake current_rspec
 ```
