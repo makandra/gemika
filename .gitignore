@@ -1,3 +1,3 @@
 .idea
 pkg
-
+/spec/support/database.yml
