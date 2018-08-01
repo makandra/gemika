@@ -95,6 +95,10 @@ module Gemika
         default_config['username'] = 'travis' if Env.travis?
         default_config['encoding'] = 'utf8'
         user_config = (@yaml_config['mysql'] || @yaml_config['mysql2']) || {}
+      elsif Env.gem?('sqlite3')
+        default_config['adapter'] = 'sqlite3'
+        default_config['database'] = ':memory:'
+        user_config = (@yaml_config['sqlite'] || @yaml_config['sqlite3']) || {}
       else
         raise UnknownAdapter, "Unknown database type. Either 'pg' or 'mysql2' gem should be in your current bundle."
       end
