@@ -12,7 +12,7 @@ Here's what Gemika can give your test's development setup (all features are opt-
 
 - Test one codebase against multiple sets of runtime gem dependency sets (e.g. Rails 2.3, Rails 5.0).
 - Test one codebase against multiple Ruby versions (e.g. Ruby 1.8.7, Ruby 2.3.10).
-- Test one codebase against multiple database types (currently MySQL or PostgreSQL).
+- Test one codebase against multiple database types (currently MySQL, PostgreSQL, or sqlite3).
 - Compute a matrix of all possible dependency permutations (Ruby, runtime gems, database type). Manually exclude incompatible dependency permutations (e.g. Rails 5.0 does not work with Ruby 2.1).
 - Let developers enter their local credentials for MySQL and PostgreSQL in a `database.yml` file.
 - Define default Ruby version, gem dependencies and database for developers who don't care about every possible permutation for everyday work.
@@ -30,7 +30,7 @@ Gemika currently supports the following dependency versions:
 - Ruby: 1.8.7, 2.1, 2.2, 2.3
 - RSpec: Versions 1, 2, 3
 - ActiveRecord: Versions 2.3, 3.2, 4.2, 5.0
-- Databases: PostgreSQL (with `pg` gem), MySQL or MariaDB (with `mysql2` gem)
+- Databases: PostgreSQL (with `pg` gem), MySQL or MariaDB (with `mysql2` gem), or sqlite3 (with `sqlite3` gem)
 
 Gemika also makes some assumption about your Gem:
 

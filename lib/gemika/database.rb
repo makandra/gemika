@@ -100,7 +100,7 @@ module Gemika
         default_config['database'] = ':memory:'
         user_config = (@yaml_config['sqlite'] || @yaml_config['sqlite3']) || {}
       else
-        raise UnknownAdapter, "Unknown database type. Either 'pg' or 'mysql2' gem should be in your current bundle."
+        raise UnknownAdapter, "Unknown database type. Either 'pg', 'mysql2', or 'sqlite3' gem should be in your current bundle."
       end
       default_config.merge(user_config)
     end
