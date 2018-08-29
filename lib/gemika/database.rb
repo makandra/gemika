@@ -19,8 +19,8 @@ module Gemika
       if File.exists?(yaml_config_path)
         @yaml_config = YAML.load_file(yaml_config_path)
       else
-        warn "No database configuration in #{yaml_config_path}, using defaults: #{adapter_config.inspect}"
         @yaml_config = {}
+        warn "No database configuration in #{yaml_config_path}, using defaults: #{adapter_config.inspect}"
       end
       @connected = false
     end
