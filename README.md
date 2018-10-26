@@ -295,6 +295,9 @@ postgresql:
   database: minidusen_test
   user:
   password:
+  
+sqlite:
+  database: ":memory:"
 ```
 
 We don't want to commit our local credentials, so add a line to your `.gitignore`:
