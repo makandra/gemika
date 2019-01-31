@@ -13,4 +13,4 @@ gem 'rake'
 gem 'database_cleaner'
 
 # Gem under test
-gem 'gemika', :path => '..'
+gem 'gemika', :path => '.'

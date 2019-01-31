@@ -1,16 +1,16 @@
 source 'https://rubygems.org'
 
 # Ruby
-ruby '>= 2.2'
+ruby '>= 1.9.3'
 
 # Runtime dependencies
-gem 'activerecord', '~>5.0.0'
-gem 'rspec', '~>3.5'
-gem 'sqlite3'
+gem 'activerecord', '~>4.2.1'
+gem 'rspec', '~>3.4'
+gem 'mysql2', '~> 0.3.17'
 
 # Development dependencies
 gem 'rake'
 gem 'database_cleaner'
 
 # Gem under test
-gem 'gemika', :path => '..'
+gem 'gemika', :path => '.'

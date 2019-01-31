@@ -1,5 +1,5 @@
 PATH
-  remote: ..
+  remote: .
   specs:
     gemika (0.3.4)
 
@@ -23,7 +23,7 @@ GEM
     diff-lcs (1.2.5)
     i18n (0.7.0)
     minitest (5.9.0)
-    pg (0.18.4)
+    mysql2 (0.4.4)
     rake (11.3.0)
     rspec (3.5.0)
       rspec-core (~> 3.5.0)
@@ -49,7 +49,7 @@ DEPENDENCIES
   activerecord (~> 5.0.0)
   database_cleaner
   gemika!
-  pg (~> 0.18.4)
+  mysql2 (~> 0.4.4)
   rake
   rspec (~> 3.5)
 

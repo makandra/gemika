@@ -11,7 +11,7 @@ This project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html
 
 ### Compatible changes
 
--
+- move gemfiles to project root
 
 
 ## 0.3.4 - 2018-08-29
