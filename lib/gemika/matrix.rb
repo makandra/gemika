@@ -16,10 +16,12 @@ module Gemika
         def load_rows(options)
           path = options.fetch(:path, '.travis.yml')
           travis_yml = YAML.load_file(path)
-          rubies = travis_yml.fetch('rvm')
-          gemfiles = travis_yml.fetch('gemfile')
+          rubies = travis_yml.fetch('rvm', [])
+          gemfiles = travis_yml.fetch('gemfile', [])
           matrix_options = travis_yml.fetch('matrix', {})
+          includes = matrix_options.fetch('include', [])
           excludes = matrix_options.fetch('exclude', [])
+
           rows = []
           rubies.each do |ruby|
             gemfiles.each do |gemfile|
@@ -27,6 +29,8 @@ module Gemika
               rows << row unless excludes.include?(row)
             end
           end
+
+          rows = rows + includes
           rows = rows.map { |row| convert_row(row) }
           rows
         end

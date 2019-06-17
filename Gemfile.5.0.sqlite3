@@ -11,6 +11,7 @@ gem 'sqlite3'
 # Development dependencies
 gem 'rake'
 gem 'database_cleaner'
+gem 'pry'
 
 # Gem under test
 gem 'gemika', :path => '.'

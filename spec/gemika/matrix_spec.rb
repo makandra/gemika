@@ -131,6 +131,22 @@ EOF
       matrix.rows[2].gemfile.should == 'gemfiles/Gemfile2'
     end
 
+    it 'allows to include rows to the matrix' do
+      path = 'spec/fixtures/travis_yml/includes.yml'
+      matrix = Gemika::Matrix.from_travis_yml(:path => path, :validate => false)
+      matrix.rows.size.should == 5
+      matrix.rows[0].ruby.should == '2.1.8'
+      matrix.rows[0].gemfile.should == 'gemfiles/Gemfile1'
+      matrix.rows[1].ruby.should == '2.1.8'
+      matrix.rows[1].gemfile.should == 'gemfiles/Gemfile2'
+      matrix.rows[2].ruby.should == '2.3.1'
+      matrix.rows[2].gemfile.should == 'gemfiles/Gemfile1'
+      matrix.rows[3].ruby.should == '2.3.1'
+      matrix.rows[3].gemfile.should == 'gemfiles/Gemfile2'
+      matrix.rows[4].ruby.should == '2.6.3'
+      matrix.rows[4].gemfile.should == 'gemfiles/Gemfile3'
+    end
+
     it 'raises an error if a Gemfile does not exist' do
       path = 'spec/fixtures/travis_yml/missing_gemfile.yml'
       expect { Gemika::Matrix.from_travis_yml(:path => path) }.to raise_error(Gemika::MissingGemfile, /gemfile not found/i)
