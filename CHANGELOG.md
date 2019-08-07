@@ -12,7 +12,8 @@ This project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html
 ### Compatible changes
 
 - Move gemfiles to project root
-- Added support to read the `include` option from the `travis.yml` file.
+- Added support to read the `include` option from the `travis.yml` file. All combinations defined in the include option
+  are added to the existing matrix. If no matrix exist, these are the only ones that are run.
 
   Example:
 
@@ -27,10 +28,8 @@ This project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html
 
   matrix:
     include:
-      - rvm: 2.1.8
-        gemfile: gemfiles/Gemfile1
-      - rvm: 2.3.1
-        gemfile: gemfiles/Gemfile2
+      - rvm: 2.6.3
+        gemfile: gemfiles/Gemfile3
   ```
 
 ## 0.3.4 - 2018-08-29
