@@ -2,6 +2,9 @@ language: ruby
 
 dist: trusty
 
+services:
+  - postgresql
+
 matrix:
   include:
     # Rails 2.3
@@ -59,3 +62,5 @@ sudo: false
 
 cache: bundler
 
+addons:
+  postgresql: 9.3
