@@ -27,19 +27,22 @@ matrix:
       rvm: 2.3.1
     - gemfile: Gemfile.4.2.pg
       rvm: 2.3.1
-    # Rails 5.0
-    - gemfile: Gemfile.5.0.mysql2
+    # Rails 5.2
+    - gemfile: Gemfile.5.2.mysql2
       rvm: 2.2.4
-    - gemfile: Gemfile.5.0.pg
+    - gemfile: Gemfile.5.2.pg
       rvm: 2.2.4
-    - gemfile: Gemfile.5.0.sqlite3
+    - gemfile: Gemfile.5.2.sqlite3
       rvm: 2.2.4
-    - gemfile: Gemfile.5.0.mysql2
+    - gemfile: Gemfile.5.2.mysql2
       rvm: 2.3.1
-    - gemfile: Gemfile.5.0.pg
+    - gemfile: Gemfile.5.2.pg
       rvm: 2.3.1
-    - gemfile: Gemfile.5.0.sqlite3
+    - gemfile: Gemfile.5.2.sqlite3
       rvm: 2.3.1
+    # Rails 6.0
+    - gemfile: Gemfile.6.0.pg
+      rvm: 2.6.4
 
 install:
   # Replace default Travis CI bundler script with a version that doesn't
