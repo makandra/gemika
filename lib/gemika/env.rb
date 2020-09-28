@@ -88,6 +88,12 @@ module Gemika
     end
 
     ##
+    # Return whether this process is running within a Github Actions build.
+    def github?
+      ENV.key?('GITHUB_WORKFLOW')
+    end
+
+    ##
     # Creates an hash that enumerates entries in order of insertion.
     #
     # @!visibility private

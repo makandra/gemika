@@ -14,7 +14,13 @@ module Gemika
 
     def initialize(options = {})
       yaml_config_folder = options.fetch(:config_folder, 'spec/support')
-      yaml_config_filename = Env.travis? ? 'database.travis.yml' : 'database.yml'
+      yaml_config_filename = if Env.travis?
+        'database.travis.yml'
+      elsif Env.github?
+        'database.github.yml'
+      else
+        'database.yml'
+      end
       yaml_config_path = File.join(yaml_config_folder, yaml_config_filename)
       if File.exists?(yaml_config_path)
         @yaml_config = YAML.load_file(yaml_config_path)
