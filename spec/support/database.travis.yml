@@ -1,9 +1,0 @@
-mysql:
-  database: gemika_test
-  username: travis
-  password:
-
-postgresql:
-  database: gemika_test
-  user: postgres
-  password:
