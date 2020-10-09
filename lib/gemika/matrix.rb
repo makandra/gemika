@@ -137,6 +137,12 @@ module Gemika
 
     attr_reader :rows, :current_ruby
 
+    def self.generate_github_actions_workflow(options= {})
+      require 'gemika/github_actions_generator'
+      rows = TravisConfig.load_rows(options)
+      GithubActionsGenerator.new(bundler_version: Bundler::VERSION).generate(rows)
+    end
+
     private
 
     def puts(*args)

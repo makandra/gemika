@@ -1,0 +1,133 @@
+name: Tests
+'on':
+  push:
+    branches:
+    - master
+  pull_request:
+    branches:
+    - master
+jobs:
+  test_mysql:
+    runs-on: ubuntu-20.04
+    services:
+      mysql:
+        image: mysql:5.6
+        env:
+          MYSQL_ROOT_PASSWORD: password
+        options: --health-cmd "mysqladmin ping" --health-interval 10s --health-timeout
+          5s --health-retries 5
+        ports:
+        - 5432:5432
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+        - ruby: 1.8.7
+          gemfile: Gemfile.2.3.mysql2
+        - ruby: 1.8.7
+          gemfile: Gemfile.3.2.mysql2
+        - ruby: 2.1.8
+          gemfile: Gemfile.3.2.mysql2
+        - ruby: 2.2.4
+          gemfile: Gemfile.3.2.mysql2
+        - ruby: 2.1.8
+          gemfile: Gemfile.4.2.mysql2
+        - ruby: 2.2.4
+          gemfile: Gemfile.4.2.mysql2
+        - ruby: 2.3.1
+          gemfile: Gemfile.4.2.mysql2
+        - ruby: 2.2.4
+          gemfile: Gemfile.5.2.mysql2
+        - ruby: 2.3.1
+          gemfile: Gemfile.5.2.mysql2
+    env:
+      BUNDLE_GEMFILE: "${{ matrix.gemfile }}"
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: "${{ matrix.ruby }}"
+    - name: Setup database
+      run: |
+        sudo apt-get install -y postgresql-client
+        PGPASSWORD=postgres psql -c 'create database active_type_test;' -U postgres -p 5432 -h localhost
+    - name: Bundle
+      run: |
+        gem install bundler:1.17.3
+        bundle install --no-deployment
+    - name: Run tests
+      run: bundle exec rake spec
+  test_pg:
+    runs-on: ubuntu-20.04
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_PASSWORD: postgres
+        options: "--health-cmd pg_isready --health-interval 10s --health-timeout 5s
+          --health-retries 5"
+        ports:
+        - 5432:5432
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+        - ruby: 2.1.8
+          gemfile: Gemfile.4.2.pg
+        - ruby: 2.2.4
+          gemfile: Gemfile.4.2.pg
+        - ruby: 2.3.1
+          gemfile: Gemfile.4.2.pg
+        - ruby: 2.2.4
+          gemfile: Gemfile.5.2.pg
+        - ruby: 2.3.1
+          gemfile: Gemfile.5.2.pg
+        - ruby: 2.6.4
+          gemfile: Gemfile.6.0.pg
+    env:
+      BUNDLE_GEMFILE: "${{ matrix.gemfile }}"
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: "${{ matrix.ruby }}"
+    - name: Setup database
+      run: |
+        sudo apt-get install -y postgresql-client
+        PGPASSWORD=postgres psql -c 'create database active_type_test;' -U postgres -p 5432 -h localhost
+    - name: Bundle
+      run: |
+        gem install bundler:1.17.3
+        bundle install --no-deployment
+    - name: Run tests
+      run: bundle exec rake spec
+  test_sqlite:
+    runs-on: ubuntu-20.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+        - ruby: 2.2.4
+          gemfile: Gemfile.5.2.sqlite3
+        - ruby: 2.3.1
+          gemfile: Gemfile.5.2.sqlite3
+    env:
+      BUNDLE_GEMFILE: "${{ matrix.gemfile }}"
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: "${{ matrix.ruby }}"
+    - name: Setup database
+      run: |
+        sudo apt-get install -y postgresql-client
+        PGPASSWORD=postgres psql -c 'create database active_type_test;' -U postgres -p 5432 -h localhost
+    - name: Bundle
+      run: |
+        gem install bundler:1.17.3
+        bundle install --no-deployment
+    - name: Run tests
+      run: bundle exec rake spec

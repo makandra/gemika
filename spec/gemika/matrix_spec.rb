@@ -253,4 +253,10 @@ EOF
     end
   end
 
+  describe '.generate_github_actions_workflow' do
+    github_actions_workflow = Gemika::Matrix.generate_github_actions_workflow(path: 'spec/fixtures/migrate/travis.yml')
+    expected_github_actions_workflow = YAML.load_file('spec/fixtures/migrate/expected_github_actions.yml')
+    github_actions_workflow.should == expected_github_actions_workflow
+  end
+
 end
