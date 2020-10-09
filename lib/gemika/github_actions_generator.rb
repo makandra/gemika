@@ -34,7 +34,7 @@ module Gemika
               'MYSQL_ROOT_PASSWORD' => 'password',
             },
             'options' => '--health-cmd "mysqladmin ping" --health-interval 10s --health-timeout 5s --health-retries 5',
-            'ports' => ['5432:5432'],
+            'ports' => ['3306:3306'],
           },
         },
       },
