@@ -1,4 +1,4 @@
-# Gemika [![Build Status](https://travis-ci.org/makandra/gemika.svg?branch=master)](https://travis-ci.org/makandra/gemika)
+# Gemika  [![Tests](https://github.com/makandra/gemika/workflows/Tests/badge.svg)](https://github.com/makandra/gemika/actions)
 
 ## Test a Ruby gem against multiple versions of everything
 
@@ -16,8 +16,9 @@ Here's what Gemika can give your test's development setup (all features are opt-
 - Compute a matrix of all possible dependency permutations (Ruby, runtime gems, database type). Manually exclude incompatible dependency permutations (e.g. Rails 5.0 does not work with Ruby 2.1).
 - Let developers enter their local credentials for MySQL and PostgreSQL in a `database.yml` file.
 - Define default Ruby version, gem dependencies and database for developers who don't care about every possible permutation for everyday work.
-- Help configure a [Travis CI](https://travis-ci.org/) build that tests every dependency permutation after each `git push`.
-- Share your Ruby / gem dependeny / database permutation between local development and Travis CI.
+- Help configure a [Travis CI](https://travis-ci.org/) or Github Actions build that tests every dependency permutation after each `git push`.
+- Share your Ruby / gem dependeny / database permutation between local development and Travis CI / Github Actions.
+- Migrate your Travis CI config to a Github Actions config.
 - Define an [ActiveRecord database migration](http://api.rubyonrails.org/classes/ActiveRecord/Migration.html) that sets up your test database.
 - Automatically drop and re-create your test database before each run of your test suite.
 - Work around breaking changes in RSpec, Ruby and other gems
@@ -65,6 +66,7 @@ spec/support/database.rb                    # Database schema for test database
 spec/support/database.yml                   # Database credentials for local development (not checked in)
 spec/support/database.sample.yml            # Sample database credentials for new developers
 spec/support/database.travis.yml            # Database credentials for Travis CI
+spec/support/database.github.yml            # Alternatively: Database credentials for Github Actions
 spec/my_gem/my_class_spec.rb                # Tests for your gem
 ```
 
@@ -152,7 +154,7 @@ source 'https://rubygems.org'
 
 # Runtime dependencies
 gem 'rails', '~>3.2.22'
-gem 'mysql2', '= 0.3.17'
+gem 'mysql2', '= 0.4.10'
 
 # Development dependencies
 gem 'rspec', '~> 3.4'
@@ -216,6 +218,9 @@ gemfile:
 Don't mind the `rvm` key if you're using a different version manager locally (like rbenv). Things will still work.
 
 
+Alternatively, create a Github Actions file like [this](/makandra/gemika/blob/master/.github/workflows/test.yml).
+
+
 #### Excluding incompatible matrix rows
 
 There might be incompatible combinations of gemfiles and Rubies, e.g. Rails 5.0 does not work with Ruby 2.1 or lower. In this case, add an `matrix`/`exclude` key to your `.travis.yml`:
@@ -227,6 +232,32 @@ matrix:
       rvm: 2.1.8
     - gemfile: Gemfile.5.0.pg
       rvm: 2.1.8
+```
+
+For `.github/workflows/test.yml`, it looks similar:
+
+```yaml
+jobs:
+  my_job:
+    strategy:
+      matrix:
+        exclude:
+          - gemfile: Gemfile.5.0.mysql2
+            ruby: 2.1.8
+          - gemfile: Gemfile.5.0.pg
+            ruby: 2.1.8
+```
+
+
+Alternatively, you can instead explicitly list all Ruby / Gemfile combinations with
+
+```
+matrix:
+  include:
+  - gemfile: Gemfile.5.0.mysql2
+    rvm: 2.3.8
+  - gemfile: Gemfile.5.2.mysql2
+    rvm: 2.3.8
 ```
 
 ### Generate lockfiles
@@ -332,6 +363,25 @@ Dir["#{File.dirname(__FILE__)}/support/*.rb"].sort.each {|f| require f}
 Now you have a great place for code snippets that need to run before specs (factories, VCR configuration, etc.).
 
 
+To have your database work with Github Actions, add a database file `spec/support/database.github.yml`.
+
+```
+mysql:
+  database: test
+  username: root
+  password: password
+  host: 127.0.0.1
+  port: 3306
+
+postgresql:
+  database: test
+  host: localhost
+  username: postgres
+  password: postgres
+  port: 5432
+```
+
+
 #### Test database schema
 
 If your gem is talking to the database, you probably need to create some example tables.
@@ -386,6 +436,25 @@ Gemika::RSpec.configure_clean_database_before_example
 ```
 
 Note that you also need `require 'gemika'` in your `spec_helper.rb`.
+
+
+#### Migrate from Travis CI to Github Actions
+
+To help in your migrations, you can ask Gemika to generate a Github Actions config from an existing `.travis-ci.yml`.
+
+To do this, call
+
+```
+bundle exec rake gemika:generate_github_actions_workflow
+```
+
+Copy the resulting file to `.github/workflows/test.yml`.
+
+Make sure you have a `spec/support/database.github.yml` if you use databases. See above how this is supposed to look like.
+
+You may have to fix a few things manually though. For example, Github Actions will only allow certain Ruby versions (but show you a list of supported versions when it fails).
+
+Also, when you run on a Ubuntu 20.04 container, you might have issues with the mysql2 gem. See [this guide](https://makandracards.com/makandra/486428-installing-old-versions-of-mysql2-on-ubuntu-20-04+) for a potential solution.
 
 
 ### Try it out
