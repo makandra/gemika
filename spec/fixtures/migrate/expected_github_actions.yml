@@ -50,8 +50,8 @@ jobs:
         ruby-version: "${{ matrix.ruby }}"
     - name: Setup database
       run: |
-        sudo apt-get install -y postgresql-client
-        PGPASSWORD=postgres psql -c 'create database active_type_test;' -U postgres -p 5432 -h localhost
+        sudo apt-get install -y mysql-client libmariadbclient-dev
+        mysql -e 'create database IF NOT EXISTS active_type_test;' -u root --password=password -P 3306 -h 127.0.0.1
     - name: Bundle
       run: |
         gem install bundler:1.17.3
@@ -121,10 +121,6 @@ jobs:
       uses: ruby/setup-ruby@v1
       with:
         ruby-version: "${{ matrix.ruby }}"
-    - name: Setup database
-      run: |
-        sudo apt-get install -y postgresql-client
-        PGPASSWORD=postgres psql -c 'create database active_type_test;' -U postgres -p 5432 -h localhost
     - name: Bundle
       run: |
         gem install bundler:1.17.3
