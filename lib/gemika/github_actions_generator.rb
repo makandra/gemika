@@ -90,7 +90,7 @@ module Gemika
         'run' => "gem install bundler:#{@bundler_version}\nbundle install --no-deployment\n",
       }, {
         'name' => 'Run tests',
-        'run' => 'bundle exec rake spec',
+        'run' => 'bundle exec rspec',
       }]
 
       job = {}
