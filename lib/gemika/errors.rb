@@ -6,4 +6,6 @@ module Gemika
   class UnsupportedRuby < Error; end
   class MatrixFailed < Error; end
   class RSpecFailed < Error; end
+  class MissingMatrixDefinition < Error; end
+  class InvalidMatrixDefinition < Error; end
 end

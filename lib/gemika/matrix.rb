@@ -1,46 +1,11 @@
 require 'yaml'
 require 'gemika/errors'
 require 'gemika/env'
+require 'gemika/matrix/travis_config'
+require 'gemika/matrix/github_actions_config'
 
 module Gemika
   class Matrix
-
-    ##
-    # Load `.travis.yml` files.
-    #
-    # @!visibility private
-    #
-    class TravisConfig
-      class << self
-
-        def load_rows(options)
-          path = options.fetch(:path, '.travis.yml')
-          travis_yml = YAML.load_file(path)
-          rubies = travis_yml.fetch('rvm', [])
-          gemfiles = travis_yml.fetch('gemfile', [])
-          matrix_options = travis_yml.fetch('matrix', {})
-          includes = matrix_options.fetch('include', [])
-          excludes = matrix_options.fetch('exclude', [])
-
-          rows = []
-          rubies.each do |ruby|
-            gemfiles.each do |gemfile|
-              row = { 'rvm' => ruby, 'gemfile' => gemfile }
-              rows << row unless excludes.include?(row)
-            end
-          end
-
-          rows = rows + includes
-          rows = rows.map { |row| convert_row(row) }
-          rows
-        end
-
-        def convert_row(travis_row)
-          Row.new(:ruby => travis_row['rvm'], :gemfile => travis_row['gemfile'])
-        end
-
-      end
-    end
 
     ##
     # A row in the test matrix
@@ -129,6 +94,25 @@ module Gemika
       print_summary
     end
 
+
+    ##
+    # Builds a {Matrix} from a `.travis.yml` file, or falls back to a Github Action .yml file
+    #
+    # @param [Hash] options
+    # @option options [String] Path to the `.travis.yml` file.
+    #
+    def self.from_ci_config
+      travis_location = '.travis.yml'
+      workflow_location = '.github/workflows/test.yml'
+      if File.exists?(travis_location)
+        from_travis_yml(:path => travis_location)
+      elsif File.exists?(workflow_location)
+        from_github_actions_yml(:path => workflow_location)
+      else
+        raise MissingMatrixDefinition, "expected either a #{travis_location} or a #{workflow_location}"
+      end
+    end
+
     ##
     # Builds a {Matrix} from the given `.travis.yml` file.
     #
@@ -137,6 +121,17 @@ module Gemika
     #
     def self.from_travis_yml(options = {})
       rows = TravisConfig.load_rows(options)
+      new(options.merge(:rows => rows))
+    end
+
+    ##
+    # Builds a {Matrix} from the given Github Action workflow definition
+    #
+    # @param [Hash] options
+    # @option options [String] Path to the `.yml` file.
+    #
+    def self.from_github_actions_yml(options = {})
+      rows = GithubActionsConfig.load_rows(options)
       new(options.merge(:rows => rows))
     end
 

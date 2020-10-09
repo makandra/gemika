@@ -9,7 +9,7 @@ namespace :matrix do
 
   desc "Run specs for all Ruby #{RUBY_VERSION} gemfiles"
   task :spec, :files do |t, options|
-    Gemika::Matrix.from_travis_yml.each do |row|
+    Gemika::Matrix.from_ci_config.each do |row|
       options = options.to_hash.merge(
         :gemfile => row.gemfile,
         :fatal => false,
@@ -21,21 +21,21 @@ namespace :matrix do
 
   desc "Install all Ruby #{RUBY_VERSION} gemfiles"
   task :install do
-    Gemika::Matrix.from_travis_yml.each do |row|
+    Gemika::Matrix.from_ci_config.each do |row|
       system('bundle install')
     end
   end
 
   desc "List dependencies for all Ruby #{RUBY_VERSION} gemfiles"
   task :list do
-    Gemika::Matrix.from_travis_yml.each do |row|
+    Gemika::Matrix.from_ci_config.each do |row|
       system('bundle list')
     end
   end
 
   desc "Update all Ruby #{RUBY_VERSION} gemfiles"
   task :update, :gems do |t, options|
-    Gemika::Matrix.from_travis_yml.each do |row|
+    Gemika::Matrix.from_ci_config.each do |row|
       system("bundle update #{options[:gems]}")
     end
   end

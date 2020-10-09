@@ -159,4 +159,98 @@ EOF
 
   end
 
+  describe '.from_github_actions_yml' do
+
+    it 'builds a matrix by combining Ruby versions and gemfiles from a Github Actions workflow configuration file' do
+      path = 'spec/fixtures/github_actions_yml/two_by_two.yml'
+      matrix = Gemika::Matrix.from_github_actions_yml(:path => path, :validate => false)
+      matrix.rows.size.should == 4
+      matrix.rows[0].ruby.should == '2.1.8'
+      matrix.rows[0].gemfile.should == 'gemfiles/Gemfile1'
+      matrix.rows[1].ruby.should == '2.1.8'
+      matrix.rows[1].gemfile.should == 'gemfiles/Gemfile2'
+      matrix.rows[2].ruby.should == '2.3.1'
+      matrix.rows[2].gemfile.should == 'gemfiles/Gemfile1'
+      matrix.rows[3].ruby.should == '2.3.1'
+      matrix.rows[3].gemfile.should == 'gemfiles/Gemfile2'
+    end
+
+    it 'combines matrixes of multiple jobs' do
+      path = 'spec/fixtures/github_actions_yml/multiple_jobs.yml'
+      matrix = Gemika::Matrix.from_github_actions_yml(:path => path, :validate => false)
+      matrix.rows.size.should == 2
+      matrix.rows[0].ruby.should == '2.1.8'
+      matrix.rows[0].gemfile.should == 'gemfiles/Gemfile1'
+      matrix.rows[1].ruby.should == '2.3.1'
+      matrix.rows[1].gemfile.should == 'gemfiles/Gemfile2'
+    end
+
+    it 'allows to exclude rows from the matrix' do
+      path = 'spec/fixtures/github_actions_yml/excludes.yml'
+      matrix = Gemika::Matrix.from_github_actions_yml(:path => path, :validate => false)
+      matrix.rows.size.should == 3
+      matrix.rows[0].ruby.should == '2.1.8'
+      matrix.rows[0].gemfile.should == 'gemfiles/Gemfile2'
+      matrix.rows[1].ruby.should == '2.3.1'
+      matrix.rows[1].gemfile.should == 'gemfiles/Gemfile1'
+      matrix.rows[2].ruby.should == '2.3.1'
+      matrix.rows[2].gemfile.should == 'gemfiles/Gemfile2'
+    end
+
+    it 'allows to include rows to the matrix' do
+      path = 'spec/fixtures/github_actions_yml/includes.yml'
+      matrix = Gemika::Matrix.from_github_actions_yml(:path => path, :validate => false)
+      matrix.rows.size.should == 6
+      matrix.rows[0].ruby.should == '2.1.8'
+      matrix.rows[0].gemfile.should == 'gemfiles/Gemfile1'
+      matrix.rows[1].ruby.should == '2.1.8'
+      matrix.rows[1].gemfile.should == 'gemfiles/Gemfile2'
+      matrix.rows[2].ruby.should == '2.3.1'
+      matrix.rows[2].gemfile.should == 'gemfiles/Gemfile1'
+      matrix.rows[3].ruby.should == '2.3.1'
+      matrix.rows[3].gemfile.should == 'gemfiles/Gemfile2'
+      matrix.rows[4].ruby.should == '2.6.3'
+      matrix.rows[4].gemfile.should == 'gemfiles/Gemfile3'
+      matrix.rows[5].ruby.should == '2.7.1'
+      matrix.rows[5].gemfile.should == 'gemfiles/Gemfile3'
+    end
+
+    it 'complains about missing keys' do
+      path = 'spec/fixtures/github_actions_yml/invalid.yml'
+      expect { Gemika::Matrix.from_github_actions_yml(:path => path) }.to raise_error(Gemika::InvalidMatrixDefinition)
+    end
+
+    it 'raises an error if a Gemfile does not exist' do
+      path = 'spec/fixtures/github_actions_yml/missing_gemfile.yml'
+      expect { Gemika::Matrix.from_github_actions_yml(:path => path) }.to raise_error(Gemika::MissingGemfile, /gemfile not found/i)
+    end
+
+    it 'raises an error if a Gemfile does not depend on "gemika"' do
+      path = 'spec/fixtures/github_actions_yml/gemfile_without_gemika.yml'
+      expect { Gemika::Matrix.from_github_actions_yml(:path => path) }.to raise_error(Gemika::UnusableGemfile, /missing gemika dependency/i)
+    end
+
+  end
+
+  describe '.from_ci_config' do
+    it 'parses the .travis.yml if it exists' do
+      File.should_receive(:exists?).with('.travis.yml').and_return(true)
+      Gemika::Matrix.should_receive(:from_travis_yml).and_return('travis matrix')
+      Gemika::Matrix.from_ci_config.should == 'travis matrix'
+    end
+
+    it 'parses the .github/workflows/test.yml if it exists' do
+      File.should_receive(:exists?).with('.travis.yml').and_return(false)
+      File.should_receive(:exists?).with('.github/workflows/test.yml').and_return(true)
+      Gemika::Matrix.should_receive(:from_github_actions_yml).and_return('github matrix')
+      Gemika::Matrix.from_ci_config.should == 'github matrix'
+    end
+
+    it 'raises an error if no ci definition exists' do
+      File.should_receive(:exists?).with('.travis.yml').and_return(false)
+      File.should_receive(:exists?).with('.github/workflows/test.yml').and_return(false)
+      expect { Gemika::Matrix.from_ci_config }.to raise_error(Gemika::MissingMatrixDefinition)
+    end
+  end
+
 end

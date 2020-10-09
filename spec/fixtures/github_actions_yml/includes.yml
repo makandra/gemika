@@ -1,0 +1,20 @@
+matrix:
+jobs:
+  first_job:
+    strategy:
+      matrix:
+        ruby:
+          - "2.1.8"
+          - "2.3.1"
+        gemfile:
+          - gemfiles/Gemfile1
+          - gemfiles/Gemfile2
+        include:
+          - ruby: 2.6.3
+            gemfile: gemfiles/Gemfile3
+  second_job:
+    strategy:
+      matrix:
+        include:
+          - ruby: 2.7.1
+            gemfile: gemfiles/Gemfile3

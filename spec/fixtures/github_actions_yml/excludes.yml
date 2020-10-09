@@ -1,0 +1,13 @@
+jobs:
+  first_job:
+    strategy:
+      matrix:
+        ruby:
+          - "2.1.8"
+          - "2.3.1"
+        gemfile:
+          - gemfiles/Gemfile1
+          - gemfiles/Gemfile2
+        exclude:
+          - ruby: 2.1.8
+            gemfile: gemfiles/Gemfile1

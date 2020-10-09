@@ -1,0 +1,8 @@
+jobs:
+  first_job:
+    strategy:
+      matrix:
+        ruby:
+          - 2.1.8
+        gemfile:
+          - spec/fixtures/travis_yml/Gemfile_without_gemika
