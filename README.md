@@ -218,7 +218,7 @@ gemfile:
 Don't mind the `rvm` key if you're using a different version manager locally (like rbenv). Things will still work.
 
 
-Alternatively, create a Github Actions file like [this](/makandra/gemika/blob/master/.github/workflows/test.yml).
+Alternatively, create a Github Actions file like [this](/.github/workflows/test.yml).
 
 
 #### Excluding incompatible matrix rows
