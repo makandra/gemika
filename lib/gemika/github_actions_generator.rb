@@ -8,7 +8,7 @@ module Gemika
         gemfile_filter: /\.pg/,
         database_setup: [
           'sudo apt-get install -y postgresql-client',
-          "PGPASSWORD=postgres psql -c 'create database active_type_test;' -U postgres -p 5432 -h localhost",
+          "PGPASSWORD=postgres psql -c 'create database test;' -U postgres -p 5432 -h localhost",
         ],
         services: {
           'postgres' => {
@@ -25,7 +25,7 @@ module Gemika
         gemfile_filter: /\.mysql/,
         database_setup: [
           'sudo apt-get install -y mysql-client libmariadbclient-dev',
-          "mysql -e 'create database IF NOT EXISTS active_type_test;' -u root --password=password -P 3306 -h 127.0.0.1",
+          "mysql -e 'create database IF NOT EXISTS test;' -u root --password=password -P 3306 -h 127.0.0.1",
         ],
         services: {
           'mysql' => {
