@@ -4,9 +4,9 @@ source 'https://rubygems.org'
 ruby '>= 2.2'
 
 # Runtime dependencies
-gem 'activerecord', '~>6.0.0'
+gem 'activerecord', '~>6.1.0'
 gem 'rspec', '~>3.5'
-gem 'pg', '~>0.18.4'
+gem 'pg'
 
 # Development dependencies
 gem 'rake'

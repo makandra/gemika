@@ -36,7 +36,7 @@ module Gemika
     #
     def connect
       unless @connected
-        ActiveRecord::Base.establish_connection(adapter_config)
+        ActiveRecord::Base.establish_connection(**adapter_config)
         @connected = true
       end
     end
@@ -108,7 +108,7 @@ module Gemika
       else
         raise UnknownAdapter, "Unknown database type. Either 'pg', 'mysql2', or 'sqlite3' gem should be in your current bundle."
       end
-      default_config.merge(user_config)
+      default_config.merge(user_config).symbolize_keys
     end
 
     private
