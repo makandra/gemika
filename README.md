@@ -28,9 +28,9 @@ Here's what Gemika can give your test's development setup (all features are opt-
 
 Gemika currently supports the following dependency versions:
 
-- Ruby: 1.8.7, 2.1, 2.2, 2.3
+- Ruby: 1.8.7, 2.1, 2.2, 2.3, 2.6
 - RSpec: Versions 1, 2, 3
-- ActiveRecord: Versions 2.3, 3.2, 4.2, 5.0
+- ActiveRecord: Versions 2.3, 3.2, 4.2, 5.0, 6.0
 - Databases: PostgreSQL (with `pg` gem), MySQL or MariaDB (with `mysql2` gem), or sqlite3 (with `sqlite3` gem)
 
 Gemika also makes some assumption about your Gem:
@@ -695,9 +695,10 @@ Here are some hints when you try to make changes to Gemika itself:
 
 There are tests in `spec`. We only accept PRs with tests. To run tests:
 
-- Install Ruby 2.2.4
+- Install Ruby 2.6.4
 - Create a local test database `gemika_test` in both MySQL and PostgreSQL
 - Copy `spec/support/database.sample.yml` to `spec/support/database.yml` and enter your local credentials for the test databases
+- Create the databases specified in `database.yml`
 - Install development dependencies using `bundle install`
 - Run tests using `bundle exec rspec`
 
