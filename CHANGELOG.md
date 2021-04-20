@@ -11,14 +11,23 @@ This project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html
 
 ### Compatible changes
 
+-
+
+## 0.6.0 - 2021-04-20
+
+### Compatible changes
+
 - add Ruby 3 compatibility
 - drop Ruby 2.2 support
 
+## 0.5.0 - 2020-10-09
+
+### Compatible changes
+
+- add support for github actions instead of travis
+- add method to migrate travis to github actions workflow
+
 ## 0.4.0 - 2019-08-07
-
-### Breaking changes
-
--
 
 ### Compatible changes
 
