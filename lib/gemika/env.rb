@@ -35,7 +35,15 @@ module Gemika
       # process, regardless of what's in ENV temporarily
       @gemfile_changed = true
       @process_gemfile = ENV['BUNDLE_GEMFILE']
-      Bundler.with_clean_env do
+
+      # .with_clean_env is deprecated since Bundler ~> 2.
+      bundler_method = if Gemika::Env.gem?('bundler', '< 2')
+        :with_clean_env
+      else
+        :with_unbundled_env
+      end
+
+      Bundler.send(bundler_method) do
         ENV['BUNDLE_GEMFILE'] = path
         block.call(*args)
       end
