@@ -13,6 +13,12 @@ This project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html
 
 -
 
+## 0.6.1 - 2021-04-20
+
+### Compatible changes
+
+- fix deprecation warning for Bundler.with_clean_env on Bundler >= 2
+
 ## 0.6.0 - 2021-04-20
 
 ### Compatible changes
