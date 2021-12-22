@@ -4,7 +4,11 @@ require 'active_record'
 require 'gemika'
 require 'pry'
 
-ActiveRecord::Base.default_timezone = :local
+if Gemika::Env.gem?('activerecord', '>= 7.0')
+  ActiveRecord.default_timezone = :local
+else
+  ActiveRecord::Base.default_timezone = :local
+end
 
 Dir["#{File.dirname(__FILE__)}/support/*.rb"].sort.each {|f| require f}
 Dir["#{File.dirname(__FILE__)}/shared_examples/*.rb"].sort.each {|f| require f}

@@ -30,7 +30,7 @@ Gemika currently supports the following dependency versions:
 
 - Ruby: 2.3, 2.6, 3.0
 - RSpec: Versions 1, 2, 3
-- ActiveRecord: Versions 3.2, 4.2, 5.2, 6.1
+- ActiveRecord: Versions 3.2, 4.2, 5.2, 6.1, 7.0
 - Databases: PostgreSQL (with `pg` gem), MySQL or MariaDB (with `mysql2` gem), or sqlite3 (with `sqlite3` gem)
 
 Gemika also makes some assumption about your Gem:
