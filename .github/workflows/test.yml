@@ -63,6 +63,8 @@ jobs:
           gemfile: Gemfile.6.1.pg
         - ruby: 2.7.3
           gemfile: Gemfile.6.1.pg
+        - ruby: 2.7.3
+          gemfile: Gemfile.7.0.pg
         - ruby: 3.0.3
           gemfile: Gemfile.6.1.pg
         - ruby: 3.0.3
