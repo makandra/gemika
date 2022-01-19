@@ -13,6 +13,17 @@ This project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html
 
 - test against ActiveRecord 7.0
 
+## 0.7.0 - 2022-01-19
+
+### Breaking changes
+
+- Remove no longer supported ruby versions (2.3.8)
+
+### Compatible changes
+
+- test against ActiveRecord 7.0
+- add support for rbenv aliases
+
 ## 0.6.1 - 2021-04-20
 
 ### Compatible changes
