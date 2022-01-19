@@ -23,6 +23,11 @@ module Gemika
       attr_reader :ruby
 
       ##
+      # The actually used Ruby version for the row.
+      #
+      attr_reader :used_ruby
+
+      ##
       # The path to the gemfile for the row.
       #
       attr_reader :gemfile
@@ -31,7 +36,9 @@ module Gemika
       # Returns whether this row can be run with the given Ruby version.
       #
       def compatible_with_ruby?(current_ruby = Env.ruby)
-        ruby == current_ruby
+        @used_ruby = aliased_ruby(ruby)
+
+        @used_ruby == current_ruby
       end
 
       ##
@@ -43,6 +50,53 @@ module Gemika
         File.exists?(gemfile) or raise MissingGemfile, "Gemfile not found: #{gemfile}"
         contents = File.read(gemfile)
         contents.include?('gemika') or raise UnusableGemfile, "Gemfile is missing gemika dependency: #{gemfile}"
+      end
+
+      private
+
+      ##
+      # Checks if the requested ruby version is aliased by rbenv to use another ruby version.
+      # Returns the runnable ruby version.
+      #
+      def aliased_ruby(requested_version)
+        ruby_aliases = rbenv_aliases
+
+        aliased_versions = {}
+
+        ruby_aliases.split("\n").each do |ruby_alias|
+          split_pattern = /\A(.+) => (.+)\z/
+          alias_name, aliased_version = ruby_alias.match(split_pattern)&.captures
+          aliased_versions[alias_name] = aliased_version
+        end
+
+        find_aliased_ruby(requested_version, aliased_versions)
+      end
+
+      ##
+      # Recursively traverses aliases until the requested Ruby version is found.
+      # Returns the requested version if no alias can be found for that version.
+      #
+      def find_aliased_ruby(requested_version, aliased_versions)
+        found_version = aliased_versions[requested_version]
+
+        if found_version == requested_version
+          found_version
+        elsif found_version
+          find_aliased_ruby(found_version, aliased_versions)
+        else
+          requested_version
+        end
+      end
+
+      ##
+      # Returns the list of rbenv aliases, if rbenv is installed.
+      #
+      def rbenv_aliases
+        if `which rbenv` != ''
+          `rbenv alias --list`
+        else
+          ''
+        end
       end
 
     end
@@ -64,6 +118,7 @@ module Gemika
       @compatible_count = 0
       @all_passed = nil
       @current_ruby = options.fetch(:current_ruby, RUBY_VERSION)
+      @aliased_rubys = {}
     end
 
     ##
@@ -79,6 +134,9 @@ module Gemika
         gemfile = row.gemfile
         if row.compatible_with_ruby?(current_ruby)
           @compatible_count += 1
+
+          @aliased_rubys[current_ruby] = row.ruby
+
           print_title gemfile
           gemfile_passed = Env.with_gemfile(gemfile, row, &block)
           @all_passed &= gemfile_passed
@@ -178,18 +236,26 @@ module Gemika
       puts
 
       if @compatible_count == 0
-        message = "No gemfiles were compatible with Ruby #{RUBY_VERSION}"
+        message = "No gemfiles were compatible with Ruby #{@aliased_rubys[RUBY_VERSION]}"
         puts tint(message, COLOR_FAILURE)
-        puts
         raise UnsupportedRuby, message
       elsif @all_passed
-        puts tint("All gemfiles succeeded for Ruby #{RUBY_VERSION}", COLOR_SUCCESS)
-        puts
+        puts tint("All gemfiles succeeded for Ruby #{@aliased_rubys[RUBY_VERSION]}", COLOR_SUCCESS)
       else
         message = 'Some gemfiles failed'
         puts tint(message, COLOR_FAILURE)
         puts
         raise MatrixFailed, message
+      end
+
+      print_aliases
+
+      puts
+    end
+
+    def print_aliases
+      @aliased_rubys.select { |used_version, alias_name| used_version != alias_name }.each do |used_version, alias_name|
+        puts tint("Ruby #{alias_name} is an alias for Ruby #{used_version} in this environment.", COLOR_WARNING)
       end
     end
 
