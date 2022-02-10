@@ -10,6 +10,7 @@ Gem::Specification.new do |s|
   s.summary = 'Helpers for testing Ruby gems'
   s.description = s.summary
   s.license = 'MIT'
+  s.metadata = { 'rubygmes_mfa_required' => 'true' }
 
   s.files         = `git ls-files`.split("\n").reject { |path| !File.exists?(path) || File.lstat(path).symlink? }
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n").reject { |path| !File.exists?(path) || File.lstat(path).symlink? }
