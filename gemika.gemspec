@@ -10,7 +10,12 @@ Gem::Specification.new do |s|
   s.summary = 'Helpers for testing Ruby gems'
   s.description = s.summary
   s.license = 'MIT'
-  s.metadata = { 'rubygems_mfa_required' => 'true' }
+  s.metadata = {
+    'source_code_uri' => s.homepage,
+    'bug_tracker_uri' => 'https://github.com/makandra/gemika/issues',
+    'changelog_uri' => 'https://github.com/makandra/gemika/blob/master/CHANGELOG.md',
+    'rubygems_mfa_required' => 'true',
+  }
 
   s.files         = `git ls-files`.split("\n").reject { |path| !File.exists?(path) || File.lstat(path).symlink? }
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n").reject { |path| !File.exists?(path) || File.lstat(path).symlink? }

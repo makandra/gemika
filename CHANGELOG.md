@@ -7,11 +7,13 @@ This project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html
 
 ### Breaking changes
 
-- Remove no longer supported ruby versions (2.3.8)
+### Compatible changes
+
+## 0.7.1 - 2022-03-16
 
 ### Compatible changes
 
-- test against ActiveRecord 7.0
+- Activate rubygems MFA
 
 ## 0.7.0 - 2022-01-19
 
