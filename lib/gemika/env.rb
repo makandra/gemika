@@ -170,7 +170,7 @@ module Gemika
 
     def lockfile_contents(gemfile)
       lockfile = "#{gemfile}.lock"
-      File.exists?(lockfile) or raise MissingLockfile, "Lockfile not found: #{lockfile}"
+      File.exist?(lockfile) or raise MissingLockfile, "Lockfile not found: #{lockfile}"
       File.read(lockfile)
     end
 

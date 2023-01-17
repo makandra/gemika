@@ -47,7 +47,7 @@ module Gemika
       # @!visibility private
       #
       def validate!
-        File.exists?(gemfile) or raise MissingGemfile, "Gemfile not found: #{gemfile}"
+        File.exist?(gemfile) or raise MissingGemfile, "Gemfile not found: #{gemfile}"
         contents = File.read(gemfile)
         contents.include?('gemika') or raise UnusableGemfile, "Gemfile is missing gemika dependency: #{gemfile}"
       end
@@ -162,9 +162,9 @@ module Gemika
     def self.from_ci_config
       travis_location = '.travis.yml'
       workflow_location = '.github/workflows/test.yml'
-      if File.exists?(travis_location)
+      if File.exist?(travis_location)
         from_travis_yml(:path => travis_location)
-      elsif File.exists?(workflow_location)
+      elsif File.exist?(workflow_location)
         from_github_actions_yml(:path => workflow_location)
       else
         raise MissingMatrixDefinition, "expected either a #{travis_location} or a #{workflow_location}"
