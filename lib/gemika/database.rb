@@ -22,7 +22,7 @@ module Gemika
         'database.yml'
       end
       yaml_config_path = File.join(yaml_config_folder, yaml_config_filename)
-      if File.exists?(yaml_config_path)
+      if File.exist?(yaml_config_path)
         @yaml_config = YAML.load_file(yaml_config_path)
       else
         @yaml_config = {}

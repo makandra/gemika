@@ -234,21 +234,21 @@ EOF
 
   describe '.from_ci_config' do
     it 'parses the .travis.yml if it exists' do
-      File.should_receive(:exists?).with('.travis.yml').and_return(true)
+      File.should_receive(:exist?).with('.travis.yml').and_return(true)
       Gemika::Matrix.should_receive(:from_travis_yml).and_return('travis matrix')
       Gemika::Matrix.from_ci_config.should == 'travis matrix'
     end
 
     it 'parses the .github/workflows/test.yml if it exists' do
-      File.should_receive(:exists?).with('.travis.yml').and_return(false)
-      File.should_receive(:exists?).with('.github/workflows/test.yml').and_return(true)
+      File.should_receive(:exist?).with('.travis.yml').and_return(false)
+      File.should_receive(:exist?).with('.github/workflows/test.yml').and_return(true)
       Gemika::Matrix.should_receive(:from_github_actions_yml).and_return('github matrix')
       Gemika::Matrix.from_ci_config.should == 'github matrix'
     end
 
     it 'raises an error if no ci definition exists' do
-      File.should_receive(:exists?).with('.travis.yml').and_return(false)
-      File.should_receive(:exists?).with('.github/workflows/test.yml').and_return(false)
+      File.should_receive(:exist?).with('.travis.yml').and_return(false)
+      File.should_receive(:exist?).with('.github/workflows/test.yml').and_return(false)
       expect { Gemika::Matrix.from_ci_config }.to raise_error(Gemika::MissingMatrixDefinition)
     end
   end

@@ -17,8 +17,8 @@ Gem::Specification.new do |s|
     'rubygems_mfa_required' => 'true',
   }
 
-  s.files         = `git ls-files`.split("\n").reject { |path| !File.exists?(path) || File.lstat(path).symlink? }
-  s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n").reject { |path| !File.exists?(path) || File.lstat(path).symlink? }
+  s.files         = `git ls-files`.split("\n").reject { |path| !File.exist?(path) || File.lstat(path).symlink? }
+  s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n").reject { |path| !File.exist?(path) || File.lstat(path).symlink? }
   s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   s.require_paths = ["lib"]
 end
