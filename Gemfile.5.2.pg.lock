@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    gemika (0.8.0)
+    gemika (0.8.1)
 
 GEM
   remote: https://rubygems.org/
@@ -64,4 +64,4 @@ RUBY VERSION
    ruby 2.2.4p230
 
 BUNDLED WITH
-   2.3.26
+   2.2.15
