@@ -693,22 +693,34 @@ Development
 
 Here are some hints when you try to make changes to Gemika itself:
 
-There are tests in `spec`. We only accept PRs with tests. To run tests:
+There are tests in `spec`. We only accept PRs with tests. If you create a PR, the tests will automatically run on
+GitHub actions on each push. We will only merge pull requests after a green GitHub actions run.
 
-- Install Ruby 2.6.4
+To run tests locally for development, first setup your test databases:
+
 - Create a local test database `gemika_test` in both MySQL and PostgreSQL
 - Copy `spec/support/database.sample.yml` to `spec/support/database.yml` and enter your local credentials for the test databases
-- Create the databases specified in `database.yml`
-- Install development dependencies using `bundle install`
-- Run tests using `bundle exec rspec`
 
-We recommend to test large changes against multiple versions of Ruby and multiple dependency sets. Supported combinations are configured in `.travis.yml`. We provide some rake tasks to help with this:
+Afterwards you have multiple options:
 
-- Install development dependencies using `bundle matrix:install`
-- Run tests using `bundle matrix:spec`
+1. Run tests against the "main development" Ruby version (`.ruby-version`) and dependencies (`Gemfile`/`Gemfile.lock` symlinks):
+   - Install the Ruby version specified in `.ruby-version`
+   - Install development dependencies using `bundle install`
+   - Run tests using `bundle exec rspec`
 
-Note that we have configured Travis CI to automatically run tests in all supported Ruby versions and dependency sets after each push. We will only merge pull requests after a green Travis build.
+2. Run tests against a specific Ruby version (out of those mentioned in `.github/workflows/test.yml`) and all Gemfiles compatible with that version:
+   - Install and switch to the Ruby version
+   - Install development dependencies for all compatible Gemfiles using `rake matrix:install`
+   - Run tests for all compatible Gemfiles using `rake matrix:spec`
 
+3. Run tests against all compatible combinations of Ruby and Gemfile:
+   - Install all Ruby versions mentioned in `.github/workflows/test.yml`
+   - run `bin/matrix` (only supports `rbenv` for switching Ruby versions currently)
+
+Hints:
+- We recommend to have sufficiently new versions of bundler (> 2.3.0) and rubygems (> 3.3.0) installed for each Ruby version.
+- The script `bin/matrix` will warn you, if that is not the case. For all other methods you need to ensure that yourself.
+- Supported "Ruby <-> Gemfile" combinations are configured in `.github/workflows/test.yml`.
 
 Credits
 -------
