@@ -11,10 +11,15 @@ This project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html
 
 ### Compatible changes
 
+-
+
+
+## 0.8.2 - 2023-07-13
+
+### Compatible changes
+
 - Update gem and bundler versions
 - Provide dev script `bin/matrix` and update README
-
-
 
 ## 0.8.1 - 2023-01-24
 
