@@ -1,3 +1,4 @@
+require 'open3'
 require 'yaml'
 require 'gemika/errors'
 require 'gemika/env'
@@ -89,11 +90,15 @@ module Gemika
       end
 
       ##
-      # Returns the list of rbenv aliases, if rbenv is installed.
+      # Returns the list of rbenv aliases, if rbenv is installed with rbenv-aliases plugin.
       #
       def rbenv_aliases
-        if `which rbenv` != ''
-          `rbenv alias --list`
+        _output, status = Open3.capture2e('which', 'rbenv')
+        return '' unless status.success?
+
+        output, status = Open3.capture2e('rbenv', 'alias', '--list')
+        if status.success?
+          output
         else
           ''
         end

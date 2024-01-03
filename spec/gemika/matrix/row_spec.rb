@@ -57,6 +57,19 @@ describe Gemika::Matrix::Row do
       end
     end
 
+    context 'when rbenv is installed without rbenv-aliases plugin' do
+      before do
+        allow(Open3).to receive(:capture2e).with('which', 'rbenv').and_return(['/path/to/rbenv', double(success?: true, exitstatus: 0)])
+        allow(Open3).to receive(:capture2e).with('rbenv', 'alias', '--list').and_return(['rbenv: no such command `alias', double(success?: false, exitstatus: 1)])
+      end
+
+      it 'does not crash and does not print errors' do
+        expect do
+          expect(subject.compatible_with_ruby?('3.0.3')).to eq(true)
+        end.to output('').to_stdout_from_any_process.and output('').to_stderr_from_any_process
+      end
+    end
+
   end
 
 end
