@@ -11,6 +11,12 @@ This project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html
 
 ### Compatible changes
 
+-
+
+## 0.8.3 - 2024-01-04
+
+### Compatible changes
+
 - handle missing rbenv-aliases plugin
 
 
