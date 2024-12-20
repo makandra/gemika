@@ -28,9 +28,9 @@ Here's what Gemika can give your test's development setup (all features are opt-
 
 Gemika currently supports the following dependency versions:
 
-- Ruby: 2.3, 2.6, 3.2, 3.4
+- Ruby: 2.5, 2.6, 2.7, 3.2, 3.4
 - RSpec: Versions 1, 2, 3
-- ActiveRecord: Versions 3.2, 4.2, 5.2, 6.1, 7.0
+- ActiveRecord: Versions 5.2, 6.1, 7.0, 8.0
 - Databases: PostgreSQL (with `pg` gem), MySQL or MariaDB (with `mysql2` gem), or sqlite3 (with `sqlite3` gem)
 
 Gemika also makes some assumption about your Gem:
