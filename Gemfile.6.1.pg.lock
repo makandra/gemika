@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    gemika (0.8.2)
+    gemika (0.8.3)
 
 GEM
   remote: https://rubygems.org/
@@ -17,6 +17,8 @@ GEM
       minitest (>= 5.1)
       tzinfo (~> 2.0)
       zeitwerk (~> 2.3)
+    base64 (0.2.0)
+    bigdecimal (3.1.9)
     coderay (1.1.3)
     concurrent-ruby (1.1.8)
     database_cleaner (1.7.0)
@@ -25,6 +27,7 @@ GEM
       concurrent-ruby (~> 1.0)
     method_source (1.0.0)
     minitest (5.14.4)
+    mutex_m (0.3.0)
     pg (1.3.5)
     pry (0.14.2)
       coderay (~> 1.1)
@@ -52,8 +55,11 @@ PLATFORMS
 
 DEPENDENCIES
   activerecord (~> 6.1.0)
+  base64
+  bigdecimal
   database_cleaner
   gemika!
+  mutex_m
   pg (~> 1.3.5)
   pry (~> 0.14.2)
   rake
