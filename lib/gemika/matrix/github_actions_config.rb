@@ -11,6 +11,8 @@ module Gemika
 
         def load_rows(options)
           path = options.fetch(:path, '.github/workflows/test.yml')
+          raise MissingMatrixDefinition, "expected a #{path} file" unless File.exist?(path)
+
           workflow_yml = YAML.load_file(path)
 
           matrices = workflow_yml.fetch('jobs', {}).values.map do |job|

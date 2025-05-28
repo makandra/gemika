@@ -89,13 +89,6 @@ module Gemika
     end
 
     ##
-    # Returns whether this process is running within a TravisCI build.
-    #
-    def travis?
-      !!ENV['TRAVIS']
-    end
-
-    ##
     # Return whether this process is running within a Github Actions build.
     def github?
       ENV.key?('GITHUB_WORKFLOW')

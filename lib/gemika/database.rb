@@ -14,9 +14,7 @@ module Gemika
 
     def initialize(options = {})
       yaml_config_folder = options.fetch(:config_folder, 'spec/support')
-      yaml_config_filename = if Env.travis?
-        'database.travis.yml'
-      elsif Env.github?
+      yaml_config_filename = if Env.github?
         'database.github.yml'
       else
         'database.yml'
@@ -93,12 +91,10 @@ module Gemika
       default_config['database'] = guess_database_name
       if Env.gem?('pg')
         default_config['adapter'] = 'postgresql'
-        default_config['username'] = 'postgres' if Env.travis?
         default_config['password'] = ''
         user_config = @yaml_config['postgresql'] || @yaml_config['postgres'] || @yaml_config['pg'] || {}
       elsif Env.gem?('mysql2')
         default_config['adapter'] = 'mysql2'
-        default_config['username'] = 'travis' if Env.travis?
         default_config['encoding'] = 'utf8'
         user_config = (@yaml_config['mysql'] || @yaml_config['mysql2']) || {}
       elsif Env.gem?('sqlite3')

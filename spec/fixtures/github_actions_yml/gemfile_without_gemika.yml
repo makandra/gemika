@@ -5,4 +5,4 @@ jobs:
         ruby:
           - 2.1.8
         gemfile:
-          - spec/fixtures/travis_yml/Gemfile_without_gemika
+          - spec/fixtures/github_actions_yml/Gemfile_without_gemika
