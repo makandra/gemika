@@ -7,12 +7,18 @@ This project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html
 
 ### Breaking changes
 
-- Removed support for Travis CI
-- Removed migration from travis to github actions
+-
 
 ### Compatible changes
 
 -
+
+## 1.0.0 - 2025-06-16
+
+### Breaking changes
+
+- Removed support for Travis CI
+- Removed migration from travis to github actions
 
 ## 0.8.4 - 2025-01-16
 
