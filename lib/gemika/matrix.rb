@@ -118,7 +118,7 @@ module Gemika
       @color = options.fetch(:color, true)
       validate = options.fetch(:validate, true)
       @rows.each(&:validate!) if validate
-      @results = Env.new_ordered_hash
+      @results = {} # Should be order-preserving, which is true for regular hashes since Ruby 1.9.
       @compatible_count = 0
       @all_passed = nil
       @current_ruby = options.fetch(:current_ruby, RUBY_VERSION)

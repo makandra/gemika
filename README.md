@@ -507,9 +507,9 @@ Gemika::Env.gem?('activesupport', '< 5')
 Check if the current Ruby version satisfies a version requirement:
 
 ```ruby
-Gemika::Env.ruby?('>= 2')
-Gemika::Env.ruby?('< 2')
-Gemika::Env.ruby?('~> 2.1.0')
+Gemika::Env.ruby?('>= 3')
+Gemika::Env.ruby?('< 3')
+Gemika::Env.ruby?('~> 3.1.0')
 ```
 
 Check if the process is running as a Github Actions test
