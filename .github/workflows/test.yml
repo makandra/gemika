@@ -7,7 +7,9 @@ on:
   pull_request:
     branches:
     - master
+
 jobs:
+
   test_mysql:
     runs-on: ubuntu-24.04
     services:
@@ -42,6 +44,8 @@ jobs:
         bundle install --no-deployment
     - name: Run tests
       run: bundle exec rspec
+
+
   test_pg:
     runs-on: ubuntu-24.04
     services:
@@ -57,20 +61,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-        - ruby: 2.5.3
-          gemfile: Gemfile.5.2.pg
-        - ruby: 2.6.7
-          gemfile: Gemfile.6.1.pg
-        - ruby: 2.7.3
-          gemfile: Gemfile.6.1.pg
-        - ruby: 2.7.3
-          gemfile: Gemfile.7.0.pg
-        - ruby: 3.2.0
-          gemfile: Gemfile.6.1.pg
         - ruby: 3.2.0
           gemfile: Gemfile.7.0.pg
-        - ruby: 3.4.1
-          gemfile: Gemfile.6.1.pg
         - ruby: 3.4.1
           gemfile: Gemfile.7.0.pg
         - ruby: 3.2.0
@@ -98,6 +90,8 @@ jobs:
         bundle install --no-deployment
     - name: Run tests
       run: bundle exec rspec
+
+
   test_sqlite:
     runs-on: ubuntu-24.04
     strategy:
