@@ -23,8 +23,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-        - ruby: 2.5.3
-          gemfile: Gemfile.5.2.mysql2
+        - ruby: 4.0.1
+          gemfile: Gemfile.8.0.mysql2
     env:
       BUNDLE_GEMFILE: "${{ matrix.gemfile }}"
     steps:
@@ -104,8 +104,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-        - ruby: 2.5.3
-          gemfile: Gemfile.5.2.sqlite3
+        - ruby: 4.0.1
+          gemfile: Gemfile.8.0.sqlite3
     env:
       BUNDLE_GEMFILE: "${{ matrix.gemfile }}"
     steps:
