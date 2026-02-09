@@ -82,7 +82,7 @@ module Gemika
     # Check if the current version of Ruby satisfies the given requirements.
     #
     # @example
-    #   Gemika::Env.ruby?('>= 2.1.0')
+    #   Gemika::Env.ruby?('>= 3.1.0')
     #
     def ruby?(requirement)
       requirement_satisfied?(requirement, ruby)
@@ -92,24 +92,6 @@ module Gemika
     # Return whether this process is running within a Github Actions build.
     def github?
       ENV.key?('GITHUB_WORKFLOW')
-    end
-
-    ##
-    # Creates an hash that enumerates entries in order of insertion.
-    #
-    # @!visibility private
-    #
-    def new_ordered_hash
-      # We use it when ActiveSupport is activated
-      if ruby?('>= 1.9')
-        {}
-      elsif gem?('activesupport')
-        require 'active_support/ordered_hash'
-        ActiveSupport::OrderedHash.new
-      else
-        # We give up
-        {}
-      end
     end
 
     private
@@ -153,12 +135,8 @@ module Gemika
     def requirement_satisfied?(requirement, version)
       requirement = Gem::Requirement.new(requirement) if requirement.is_a?(String)
       version = Gem::Version.new(version) if version.is_a?(String)
-      if requirement.respond_to?(:satisfied_by?) # Ruby 1.9.3+
-        requirement.satisfied_by?(version)
-      else
-        ops = Gem::Requirement::OPS
-        requirement.requirements.all? { |op, rv| (ops[op] || ops["="]).call version, rv }
-      end
+
+      requirement.satisfied_by?(version)
     end
 
     def lockfile_contents(gemfile)
