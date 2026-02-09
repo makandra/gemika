@@ -13,6 +13,14 @@ This project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html
 
 -
 
+## 2.0.0 - 2026-02-12
+
+### Breaking changes
+
+- Introduce `required_ruby_version` in gemspec so people on legacy Ruby versions don't receive future upgrades
+  - This is treated as a breaking change, because `gemika` is supposed to work equally across multiple Ruby versions
+- Drop tests and support for Ruby < 3 and Rails < 7
+
 ## 1.0.0 - 2025-06-16
 
 ### Breaking changes
